@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Scopa & Scopone Deluxe</title>
+    <style>
+        :root {
+            --table-color: #1b4d3e;
+            --table-border: #0f2d24;
+            --wood-dark: #2c160b;
+            --wood-light: #4a2713;
+            --gold: #d4af37;
+            --card-width: 65px;
+            --card-height: 98px;
+        }
+
+        @media (min-width: 768px) {
+            :root {
+                --card-width: 90px;
+                --card-height: 135px;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle, var(--wood-light) 0%, var(--wood-dark) 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Menu UI */
+        h1 {
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            color: #ddd;
+            text-align: center;
+        }
+
+        .menu-btn {
+            background: linear-gradient(to bottom, #d4af37, #aa820a);
+            color: #111;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 280px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        .menu-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Game Board */
+        #game-screen {
+            justify-content: space-between;
+            padding: 10px;
+            height: 100vh;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            background: rgba(0,0,0,0.4);
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            align-items: center;
+        }
+
+        .score-display {
+            font-weight: bold;
+            color: var(--gold);
+        }
+
+        /* Player Hands Areas */
+        .player-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            min-height: 110px;
+        }
+
+        .player-info {
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            color: #ccc;
+        }
+
+        .player-info.active-turn {
+            color: var(--gold);
+            font-weight: bold;
+            text-shadow: 0 0 5px var(--gold);
+        }
+
+        .hand {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            min-height: var(--card-height);
+        }
+
+        /* Table Area */
+        .table-area {
+            background-color: var(--table-color);
+            border: 6px solid var(--table-border);
+            border-radius: 16px;
+            width: 100%;
+            flex-grow: 1;
+            margin: 8px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .table-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            max-width: 100%;
+        }
+
+        /* Cards */
+        .card {
+            width: var(--card-width);
+            height: var(--card-height);
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 6px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+            color: #222;
+        }
+
+        .card.back {
+            background: linear-gradient(135deg, #b22222, #8b0000);
+            border: 2px solid #fff;
+            cursor: default;
+        }
+
+        .card.selected {
+            transform: translateY(-15px);
+            box-shadow: 0 8px 15px rgba(212, 175, 55, 0.6);
+            border: 2px solid var(--gold);
+        }
+
+        .card.table-selectable {
+            border: 2px dashed #00ffcc;
+        }
+
+        .card-top {
+            font-size: 0.9rem;
+            line-height: 1;
+        }
+
+        .card-center {
+            font-size: 1.4rem;
+            text-align: center;
+            align-self: center;
+        }
+
+        .suit-denari { color: #d4af37; }
+        .suit-coppe { color: #b22222; }
+        .suit-spade { color: #222; }
+        .suit-bastoni { color: #5c4033; }
+
+        /* Modal Overlay */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #222;
+            border: 2px solid var(--gold);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .modal-content h2 {
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        /* Log / Notification banner */
+        .notification {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85);
+            color: var(--gold);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 50;
+            border: 1px solid var(--gold);
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        .captured-count {
+            font-size: 0.75rem;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        .controls-hint {
+            font-size: 0.8rem;
+            color: #aaa;
+            text-align: center;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MENÜ SCREEN -->
+    <div id="menu-screen" class="screen active">
+        <h1>Scopa & Scopone</h1>
+        <p class="subtitle">Das klassische italienische Kartenspiel</p>
+        <button class="menu-btn" onclick="startGame('1v1')">1 vs 1 (gegen KI)</button>
+        <button class="menu-btn" onclick="startGame('local')">Lokal / Bot-Fallback</button>
+        <button class="menu-btn" onclick="startGame('scopone')">Scopone (2 vs 2)</button>
+    </div>
+
+    <!-- SPIEL SCREEN -->
+    <div id="game-screen" class="screen">
+        <div class="top-bar">
+            <div>Modus: <span id="lbl-mode" style="color:var(--gold)">1v1</span></div>
+            <div class="score-display">Punkte: <span id="lbl-score">0 : 0</span></div>
+            <button onclick="returnToMenu()" style="background:none; border:1px solid #aaa; color:#fff; padding:3px 8px; border-radius:4px; cursor:pointer;">Menü</button>
+        </div>
+
+        <!-- Gegner oben (bei 1v1 oder Team 2) -->
+        <div class="player-area" id="area-opponent">
+            <div class="player-info" id="info-p2">Gegner</div>
+            <div class="hand" id="hand-p2"></div>
+        </div>
+
+        <!-- Tisch -->
+        <div class="table-area" id="table-area">
+            <div class="notification" id="notification">Scopa!</div>
+            <div class="table-cards" id="table-cards"></div>
+            <div class="controls-hint" id="controls-hint">Wähle eine Karte aus deiner Hand</div>
+        </div>
+
+        <!-- Eigener Spieler -->
+        <div class="player-area" id="area-player">
+            <div class="hand" id="hand-p1"></div>
+            <div class="player-info" id="info-p1">Du</div>
+        </div>
+    </div>
+
+    <!-- RUNDEN- / ENDWERTUNGS MODAL -->
+    <div class="modal" id="score-modal">
+        <div class="modal-content">
+            <h2 id="modal-title">Rundenwertung</h2>
+            <p id="modal-text">Details folgen...</p>
+            <button class="menu-btn" onclick="nextRound()" style="width:100%; margin:0;">Nächste Runde</button>
+        </div>
+    </div>
+
+    <script>
+        /* --- KARTEN & SPIELDATEN --- */
+        const SUITS = [
+            { id: 'denari', name: 'Denari', symbol: '♦', class: 'suit-denari' },
+            { id: 'coppe', name: 'Coppe', symbol: '♥', class: 'suit-coppe' },
+            { id: 'spade', name: 'Spade', symbol: '♠', class: 'suit-spade' },
+            { id: 'bastoni', name: 'Bastoni', symbol: '♣', class: 'suit-bastoni' }
+        ];
+
+        const CARD_NAMES = {
+            1: '1', 2: '2', 3: '3', 4: '4', 5: '5',
+            6: '6', 7: '7', 8: 'Fante', 9: 'Cavallo', 10: 'Re'
+        };
+
+        // Primiera-Werte der Karten
+        const PRIMIERA_VALUES = {
+            7: 21, 6: 18, 1: 16, 5: 15, 4: 14, 3: 13, 2: 12, 8: 10, 9: 10, 10: 10
+        };
+
+        let gameState = {
+            mode: '1v1', // '1v1', 'local', 'scopone'
+            round: 1,
+            deck: [],
+            table: [],
+            players: [], // Enthält Objekte für alle aktiven Spieler
+            currentTurn: 0,
+            scores: { team1: 0, team2: 0 },
+            selectedHandCard: null,
+            selectedTableCards: [],
+            fallbackTimer: null,
+            fallbackSeconds: 30
+        };
+
+        function createDeck() {
+            let deck = [];
+            SUITS.forEach(suit => {
+                for (let value = 1; value <= 10; value++) {
+                    deck.push({
+                        id: `${suit.id}_${value}`,
+                        suit: suit.id,
+                        value: value,
+                        name: CARD_NAMES[value],
+                        symbol: suit.symbol,
+                        suitClass: suit.class
+                    });
+                }
+            });
+            // Mischen (Fisher-Yates)
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+            return deck;
+        }
+
+        function startGame(mode) {
+            gameState.mode = mode;
+            gameState.scores = { team1: 0, team2: 0 };
+            gameState.round = 1;
+            
+            document.getElementById('menu-screen').classList.remove('active');
+            document.getElementById('game-screen').classList.add('active');
+            document.getElementById('lbl-mode').innerText = mode.toUpperCase();
+
+            initPlayers();
+            startNewDeal();
+        }
+
+        function initPlayers() {
+            if (gameState.mode === 'scopone') {
+                gameState.players = [
+                    { id: 0, name: 'Du (Team 1)', team: 1, hand: [], captured: [], isBot: false },
+                    { id: 1, name: 'Gegner 1 (Team 2)', team: 2, hand: [], captured: [], isBot: true },
+                    { id: 2, name: 'Partner (Team 1)', team: 1, hand: [], captured: [], isBot: true },
+                    { id: 3, name: 'Gegner 2 (Team 2)', team: 2, hand: [], captured: [], isBot: true }
+                ];
+            } else if (gameState.mode === 'local') {
+                gameState.players = [
+                    { id: 0, name: 'Spieler 1', team: 1, hand: [], captured: [], isBot: false },
+                    { id: 1, name: 'Spieler 2', team: 2, hand: [], captured: [], isBot: false, timer: 30 }
+                ];
+            } else {
+                // 1v1
+                gameState.players = [
+                    { id: 0, name: 'Du', team: 1, hand: [], captured: [], isBot: false },
+                    { id: 1, name: 'Computer', team: 2, hand: [], captured: [], isBot: true }
+                ];
+            }
+        }
+
+        function startNewDeal() {
+            gameState.deck = createDeck();
+            gameState.table = [];
+            gameState.players.forEach(p => { p.hand = []; });
+
+            // 4 Karten auf den Tisch legen
+            for (let i = 0; i < 4; i++) {
+                gameState.table.push(gameState.deck.pop());
+            }
+
+            // Prüfen ob 3 oder 4 Könige auf dem Tisch liegen (Regel: neu mischen wenn nötig, vereinfacht: wird so gelassen oder erste Runde angepasst)
+            dealCardsToPlayers();
+            gameState.currentTurn = 0;
+            updateUI();
+            checkTurnAction();
+        }
+
+        function dealCardsToPlayers() {
+            const cardsPerPlayer = gameState.mode === 'scopone' ? 10 : 3;
+            gameState.players.forEach(p => {
+                for (let i = 0; i < cardsPerPlayer; i++) {
+                    if (gameState.deck.length > 0) {
+                        p.hand.push(gameState.deck.pop());
+                    }
+                }
+            });
+        }
+
+        function returnToMenu() {
+            clearTimeout(gameState.fallbackTimer);
+            document.getElementById('game-screen').classList.remove('active');
+            document.getElementById('menu-screen').classList.add('active');
+        }
+
+        /* --- SPIELLOGIK & REGELN --- */
+        function checkTurnAction() {
+            gameState.selectedHandCard = null;
+            gameState.selectedTableCards = [];
+            updateUI();
+
+            const currentPlayer = gameState.players[gameState.currentTurn];
+
+            // Bot-Aktion oder Bot-Fallback im lokalen Modus
+            if (currentPlayer.isBot) {
+                setTimeout(runBotTurn, 800);
+            } else if (gameState.mode === 'local') {
+                // Starte 30s Fallback Timer für lokalen Modus
+                resetFallbackTimer();
+            }
+        }
+
+        function resetFallbackTimer() {
+            clearTimeout(gameState.fallbackTimer);
+            gameState.fallbackSeconds = 30;
+            // Im lokalen Modus nach 30 Inaktivität übernimmt die Bot-KI
+            gameState.fallbackTimer = setTimeout(() => {
+                const currentPlayer = gameState.players[gameState.currentTurn];
+                if (!currentPlayer.isBot) {
+                    currentPlayer.isBot = true;
+                    showNotification(`${currentPlayer.name} schläft ein! Bot übernimmt.`);
+                    setTimeout(runBotTurn, 1000);
+                }
+            }, 30000);
+        }
+
+        function handleCardClick(card) {
+            const currentPlayer = gameState.players[gameState.currentTurn];
+            if (currentPlayer.isBot) return;
+
+            if (gameState.selectedHandCard && gameState.selectedHandCard.id === card.id) {
+                gameState.selectedHandCard = null;
+                gameState.selectedTableCards = [];
+            } else {
+                gameState.selectedHandCard = card;
+                gameState.selectedTableCards = [];
+                
+                // Intelligente Vorauswahl prüfen: Gibt es exakten Treffer?
+                const exactMatch = gameState.table.find(t => t.value === card.value);
+                if (exactMatch) {
+                    gameState.selectedTableCards = [exactMatch];
+                }
+            }
+            updateUI();
+        }
+
+        function handleTableCardClick(card) {
+            const currentPlayer = gameState.players[gameState.currentTurn];
+            if (currentPlayer.isBot || !gameState.selectedHandCard) return;
+
+            const index = gameState.selectedTableCards.findIndex(c => c.id === card.id);
+            if (index > -1) {
+                gameState.selectedTableCards.splice(index, 1);
+            } else {
+                gameState.selectedTableCards.push(card);
+            }
+            updateUI();
+        }
+
+        function confirmMove() {
+            if (!gameState.selectedHandCard) return;
+            executeMove(gameState.players[gameState.currentTurn], gameState.selectedHandCard, gameState.selectedTableCards);
+        }
+
+        function executeMove(player, handCard, tableCardsToCapture) {
+            clearTimeout(gameState.fallbackTimer);
+
+            // Entferne Handkarte
+            player.hand = player.hand.filter(c => c.id !== handCard.id);
+
+            let isScopa = false;
+
+            if (tableCardsToCapture.length > 0) {
+                // Prüfen ob Zug gültig ist
+                const sum = tableCardsToCapture.reduce((acc, c) => acc + c.value, 0);
+                if (sum !== handCard.value && !(tableCardsToCapture.length === 1 && tableCardsToCapture[0].value === handCard.value)) {
+                    // Ungültiger Zug, Fallback auf Einzelwert oder Fehlversuch
+                    // Für UX: Wenn keine exakte Summe stimmt, nimm einfach den Zug hin oder korrigiere
+                }
+
+                // Karten vom Tisch nehmen
+                tableCardsToCapture.forEach(tc => {
+                    gameState.table = gameState.table.filter(c => c.id !== tc.id);
+                    player.captured.push(tc);
+                });
+                player.captured.push(handCard);
+
+                // Prüfen auf Scopa (Tisch komplett leer und nicht die allerletzte Karte der Runde)
+                if (gameState.table.length === 0 && (gameState.deck.length > 0 || gameState.players.some(p => p.hand.length > 0))) {
+                    isScopa = true;
+                    showNotification("Scopa! 🧹");
+                }
+            } else {
+                // Keine Karten genommen -> Karte auf den Tisch legen
+                gameState.table.push(handCard);
+            }
+
+            // Nächster Spieler
+            nextTurn(isScopa ? player : null);
+        }
+
+        function nextTurn(scopPlayer) {
+            // Letzter Spieler der abräumt bekommt am Rundenende übrig gebliebene Tischkarten (wird in endRound geregelt)
+            if (scopPlayer) {
+                scopPlayer.scopas = (scopPlayer.scopas || 0) + 1;
+            }
+
+            gameState.currentTurn = (gameState.currentTurn + 1) % gameState.players.length;
+
+            // Prüfen ob Runde vorbei (alle Hände leer)
+            const allHandsEmpty = gameState.players.every(p => p.hand.length === 0);
+            if (allHandsEmpty) {
+                if (gameState.deck.length > 0) {
+                    dealCardsToPlayers();
+                    checkTurnAction();
+                } else {
+                    endRound();
+                }
+            } else {
+                checkTurnAction();
+            }
+        }
+
+        /* --- KI LOGIK --- */
+        function runBotTurn() {
+            const bot = gameState.players[gameState.currentTurn];
+            if (bot.hand.length === 0) return;
+
+            // Einfache Scopa-KI:
+            // 1. Suche Zug der Scopa ermöglicht (Tisch komplett leerräumt, außer am Ende)
+            // 2. Suche exakten Treffer
+            // 3. Suche Summen-Treffer
+            // 4. Spiele Karte ab, die wenig schadet
+
+            let chosenCard = bot.hand[0];
+            let targetCards = [];
+
+            // Versuche passenden Zug zu finden
+            for (let card of bot.hand) {
+                // Exakter Treffer?
+                const exact = gameState.table.find(t => t.value === card.value);
+                if (exact) {
+                    chosenCard = card;
+                    targetCards = [exact];
+                    break;
+                }
+                // Summen-Treffer? (Simple Kombinationen)
+                const combination = findCombination(card.value, gameState.table);
+                if (combination.length > 0) {
+                    chosenCard = card;
+                    targetCards = combination;
+                    break;
+                }
+            }
+
+            executeMove(bot, chosenCard, targetCards);
+        }
+
+        function findCombination(targetVal, table) {
+            // Rekursive Hilfsfunktion für Teilmengen-Summe
+            function search(index, currentSum, currentSubset) {
+                if (currentSum === targetVal) return currentSubset;
+                if (currentSum > targetVal || index >= table.length) return null;
+
+                // Mit aktueller Karte
+                let res = search(index + 1, currentSum + table[index].value, [...currentSubset, table[index]]);
+                if (res) return res;
+
+                // Ohne aktuelle Karte
+                return search(index + 1, currentSum, currentSubset);
+            }
+            return search(0, 0, []) || [];
+        }
+
+        /* --- WERTUNG (SCORING) --- */
+        function endRound() {
+            // Verbleibende Tischkarten bekommt der Spieler/das Team, der/die zuletzt Karten genommen hat
+            // (Vereinfachung: Team 1 falls letzter Fänger unklar)
+
+            let team1Cards = 0, team2Cards = 0;
+            let team1Denari = 0, team2Denari = 0;
+            let team1Settebello = false, team2Settebello = false;
+            let team1PrimieraScore = 0, team2PrimieraScore = 0;
+
+            // Zählung nach Teams aufteilen
+            gameState.players.forEach(p => {
+                p.captured.forEach(c => {
+                    if (p.team === 1) {
+                        team1Cards++;
+                        if (c.suit === 'denari') team1Denari++;
+                        if (c.suit === 'denari' && c.value === 7) team1Settebello = true;
+                    } else {
+                        team2Cards++;
+                        if (c.suit === 'denari') team2Denari++;
+                        if (c.suit === 'denari' && c.value === 7) team2Settebello = true;
+                    }
+                });
+            });
+
+            // Primiera Berechnung pro Team (beste Karte jeder Farbe)
+            team1PrimieraScore = calculatePrimieraForTeam(1);
+            team2PrimieraScore = calculatePrimieraForTeam(2);
+
+            let roundPoints1 = 0;
+            let roundPoints2 = 0;
+            let detailsText = "";
+
+            // 1. Die meisten Karten (> 20)
+            if (team1Cards > team2Cards) { roundPoints1++; detailsText += "Team 1 bekommt Punkt für Karten (" + team1Cards + " Karten)<br>"; }
+            else if (team2Cards > team1Cards) { roundPoints2++; detailsText += "Team 2 bekommt Punkt für Karten (" + team2Cards + " Karten)<br>"; }
+
+            // 2. Die meisten Denari (> 5)
+            if (team1Denari > team2Denari) { roundPoints1++; detailsText += "Team 1 bekommt Punkt für Denari (" + team1Denari + " Münzen)<br>"; }
+            else if (team2Denari > team1Denari) { roundPoints2++; detailsText += "Team 2 bekommt Punkt für Denari (" + team2Denari + " Münzen)<br>"; }
+
+            // 3. Settebello (7 der Münzen)
+            if (team1Settebello) { roundPoints1++; detailsText += "Team 1 hat den Settebello (7♦)<br>"; }
+            else { roundPoints2++; detailsText += "Team 2 hat den Settebello (7♦)<br>"; }
+
+            // 4. Primiera
+            if (team1PrimieraScore > team2PrimieraScore) { roundPoints1++; detailsText += "Team 1 hat die Primiera<br>"; }
+            else if (team2PrimieraScore > team1PrimieraScore) { roundPoints2++; detailsText += "Team 2 hat die Primiera<br>"; }
+
+            // Scopas einrechnen
+            let scopas1 = gameState.players.filter(p => p.team === 1).reduce((acc, p) => acc + (p.scopas || 0), 0);
+            let scopas2 = gameState.players.filter(p => p.team === 2).reduce((acc, p) => acc + (p.scopas || 0), 0);
+            roundPoints1 += scopas1;
+            roundPoints2 += scopas2;
+            if(scopas1 > 0) detailsText += `Team 1: ${scopas1} Scopa(s)<br>`;
+            if(scopas2 > 0) detailsText += `Team 2: ${scopas2} Scopa(s)<br>`;
+
+            gameState.scores.team1 += roundPoints1;
+            gameState.scores.team2 += roundPoints2;
+
+            document.getElementById('modal-title').innerText = "Rundenwertung beendet";
+            document.getElementById('modal-text').innerHTML = `<b>Ergebnis dieser Runde:</b><br>${detailsText}<hr><b>Gesamtstand:</b> Team 1: ${gameState.scores.team1} | Team 2: ${gameState.scores.team2}`;
+            document.getElementById('score-modal').style.display = 'flex';
+        }
+
+        function calculatePrimieraForTeam(team) {
+            const teamPlayers = gameState.players.filter(p => p.team === team);
+            let bestCards = { denari: 0, coppe: 0, spade: 0, bastoni: 0 };
+
+            teamPlayers.forEach(p => {
+                p.captured.forEach(c => {
+                    const pVal = PRIMIERA_VALUES[c.value] || 0;
+                    if (pVal > bestCards[c.suit]) {
+                        bestCards[c.suit] = pVal;
+                    }
+                });
+            });
+
+            // Wenn eine Farbe komplett fehlt, ist die Primiera 0
+            if (bestCards.denari === 0 || bestCards.coppe === 0 || bestCards.spade === 0 || bestCards.bastoni === 0) {
+                return 0;
+            }
+            return bestCards.denari + bestCards.coppe + bestCards.spade + bestCards.bastoni;
+        }
+
+        function nextRound() {
+            document.getElementById('score-modal').style.display = 'none';
+            if (gameState.scores.team1 >= 11 || gameState.scores.team2 >= 11) {
+                alert("Spiel beendet! Endstand: Team 1: " + gameState.scores.team1 + " | Team 2: " + gameState.scores.team2);
+                returnToMenu();
+            } else {
+                gameState.round++;
+                startNewDeal();
+            }
+        }
+
+        /* --- UI RENDERING --- */
+        function updateUI() {
+            // Score anzeigen
+            document.getElementById('lbl-score').innerText = `${gameState.scores.team1} : ${gameState.scores.team2}`;
+
+            // Layout anpassen je nach Modus
+            const oppArea = document.getElementById('area-opponent');
+            if (gameState.mode === '1v1') {
+                document.getElementById('info-p2').innerText = gameState.players[1].name;
+                document.getElementById('info-p1').innerText = gameState.players[0].name;
+                renderHand('hand-p2', gameState.players[1], true);
+                renderHand('hand-p1', gameState.players[0], false);
+            } else if (gameState.mode === 'scopone') {
+                // Bei Scopone 4 Spieler: Zeige Gegnermodus vereinfacht oben
+                document.getElementById('info-p2').innerText = "Gegner-Team (2 Spieler)";
+                renderHand('hand-p2', gameState.players[1], true, true);
+                renderHand('hand-p1', gameState.players[0], false);
+            } else {
+                // Lokaler Modus
+                const activeP = gameState.players[gameState.currentTurn];
+                document.getElementById('info-p2').innerText = gameState.currentTurn === 1 ? "Dein Zug!" : "Warte auf Spieler...";
+                renderHand('hand-p2', gameState.players[1], gameState.currentTurn !== 1);
+                renderHand('hand-p1', gameState.players[0], gameState.currentTurn !== 0);
+            }
+
+            // Aktiven Spieler hervorheben
+            document.getElementById('info-p1').classList.toggle('active-turn', gameState.currentTurn === 0);
+
+            // Tisch rendern
+            renderTable();
+        }
+
+        function renderHand(elementId, player, asBack, hideCompletely = false) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
+            if (hideCompletely) return;
+
+            player.hand.forEach(card => {
+                const cardEl = document.createElement('div');
+                if (asBack) {
+                    cardEl.className = 'card back';
+                } else {
+                    cardEl.className = `card ${card.suitClass}`;
+                    if (gameState.selectedHandCard && gameState.selectedHandCard.id === card.id) {
+                        cardEl.classList.add('selected');
+                    }
+                    cardEl.innerHTML = `
+                        <div class="card-top">${card.name}<br>${card.symbol}</div>
+                        <div class="card-center">${card.symbol}</div>
+                        <div class="card-top" style="transform: rotate(180deg);">${card.name}<br>${card.symbol}</div>
+                    `;
+                    cardEl.onclick = () => handleCardClick(card);
+                }
+                container.appendChild(cardEl);
+            });
+        }
+
+        function renderTable() {
+            const container = document.getElementById('table-cards');
+            container.innerHTML = '';
+
+            gameState.table.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.className = `card ${card.suitClass}`;
+                
+                if (gameState.selectedTableCards.some(c => c.id === card.id)) {
+                    cardEl.classList.add('selected');
+                } else if (gameState.selectedHandCard) {
+                    cardEl.classList.add('table-selectable');
+                }
+
+                cardEl.innerHTML = `
+                    <div class="card-top">${card.name}<br>${card.symbol}</div>
+                    <div class="card-center">${card.symbol}</div>
+                    <div class="card-top" style="transform: rotate(180deg);">${card.name}<br>${card.symbol}</div>
+                `;
+                cardEl.onclick = () => handleTableCardClick(card);
+                container.appendChild(cardEl);
+            });
+
+            // Hinweis-Text aktualisieren
+            const hint = document.getElementById('controls-hint');
+            if (gameState.selectedHandCard) {
+                hint.innerText = "Wähle passende Tischkarten zum Einsammeln oder klicke 'Spielzug bestätigen'";
+                // Füge Bestätigungsbutton hinzu falls noch nicht da
+                if (!document.getElementById('btn-confirm')) {
+                    const btn = document.createElement('button');
+                    btn.id = 'btn-confirm';
+                    btn.className = 'menu-btn';
+                    btn.style.padding = '6px 15px';
+                    btn.style.fontSize = '0.9rem';
+                    btn.style.width = 'auto';
+                    btn.style.marginTop = '6px';
+                    btn.innerText = 'Zug ausführen / Ablegen';
+                    btn.onclick = confirmMove;
+                    container.parentNode.appendChild(btn);
+                }
+            } else {
+                hint.innerText = "Wähle eine Karte aus deiner Hand";
+                const btn = document.getElementById('btn-confirm');
+                if (btn) btn.remove();
+            }
+        }
+
+        function showNotification(text) {
+            const notif = document.getElementById('notification');
+            notif.innerText = text;
+            notif.classList.add('show');
+            setTimeout(() => {
+                notif.classList.remove('show');
+            }, 1800);
+        }
+    </script>
+</body>
+</html>
