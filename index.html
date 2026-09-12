@@ -7,13 +7,15 @@
     <style>
         :root {
             --bg-deep-blue: #0b1d3a;
-            --bg-pattern-blue: #142d56;
-            --gold-primary: #ffd700;
-            --gold-gradient: linear-gradient(135deg, #ffe600 0%, #ff9900 100%);
-            --wood-dark: #3e2723;
-            --wood-light: #5d4037;
-            --accent-green: #2e7d32;
-            --accent-red: #c62828;
+            --bg-pattern-blue: #132d56;
+            --gold-primary: #f3bc3c;
+            --gold-light: #ffea8a;
+            --gold-dark: #b8860b;
+            --wood-dark: #5c3a21;
+            --wood-light: #8b5a2b;
+            --accent-red: #d93838;
+            --accent-green: #38a169;
+            --text-main: #ffffff;
             --text-shadow: 0 2px 4px rgba(0,0,0,0.6);
         }
 
@@ -21,22 +23,21 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
             -webkit-user-select: none;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
             background-color: var(--bg-deep-blue);
             background-image: 
-                linear-gradient(45deg, var(--bg-pattern-blue) 25%, transparent 25%), 
-                linear-gradient(-45deg, var(--bg-pattern-blue) 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, var(--bg-pattern-blue) 75%), 
-                linear-gradient(-45deg, transparent 75%, var(--bg-pattern-blue) 75%);
-            background-size: 40px 40px;
-            background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
-            color: #ffffff;
+                radial-gradient(var(--bg-pattern-blue) 15%, transparent 16%),
+                radial-gradient(var(--bg-pattern-blue) 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            color: var(--text-main);
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
             display: flex;
             justify-content: center;
@@ -47,73 +48,63 @@
             width: 100%;
             max-width: 480px;
             height: 100%;
-            max-height: 850px;
-            background: rgba(11, 29, 58, 0.95);
+            max-height: 900px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(11, 29, 58, 0.85);
             box-shadow: 0 0 30px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
-            position: relative;
-            overflow: hidden;
-            border: 4px solid #b8860b;
         }
 
         .screen {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
+            display: none;
+            flex-direction: column;
+            padding: 15px;
+            z-index: 1;
+            background: var(--bg-deep-blue);
+            overflow-y: auto;
         }
 
         .screen.active {
             display: flex;
+            z-index: 10;
         }
 
-        /* Top Bar */
+        /* UI Elements & Common */
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 15px;
-            background: linear-gradient(to bottom, #1a365d, #0f223f);
-            border-bottom: 3px solid #b8860b;
-            z-index: 10;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 2px solid var(--gold-dark);
+            margin-bottom: 20px;
         }
 
-        .profile-container {
+        .profile-area {
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .avatar-frame {
-            width: 45px;
-            height: 45px;
+        .avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: var(--gold-gradient);
-            border: 2px solid #fff;
+            background: var(--gold-primary);
+            border: 2px solid var(--gold-light);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: #333;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            position: relative;
-        }
-
-        .level-badge {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            background: #ff4500;
-            color: white;
-            font-size: 0.7rem;
-            padding: 1px 5px;
-            border-radius: 10px;
-            border: 1px solid #fff;
-            font-weight: bold;
+            font-size: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
         .currencies {
@@ -121,379 +112,297 @@
             gap: 10px;
         }
 
-        .currency-pill {
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid #b8860b;
-            border-radius: 20px;
-            padding: 4px 10px 4px 6px;
+        .currency-badge {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--gold-dark);
+            border-radius: 12px;
+            padding: 4px 8px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 0.85rem;
+            gap: 5px;
+            font-size: 13px;
             font-weight: bold;
+            color: var(--gold-light);
         }
 
-        .currency-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.7rem;
-        }
-
-        .coin-icon { background: gold; color: #7a5200; }
-        .gem-icon { background: #00ffff; color: #005555; }
-
-        /* Bottom Nav */
-        .bottom-nav {
-            display: flex;
-            justify-content: space-around;
-            background: linear-gradient(to top, #1a365d, #0f223f);
-            border-top: 3px solid #b8860b;
-            padding: 10px 0;
-            z-index: 10;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #aaa;
-            font-size: 0.75rem;
-            text-decoration: none;
-            background: none;
-            border: none;
+        .btn-gold {
+            background: linear-gradient(to bottom, var(--gold-light), var(--gold-primary), var(--gold-dark));
+            color: #3a2200;
+            font-weight: bold;
+            border: 2px solid #ffffff;
+            border-radius: 25px;
+            padding: 12px 24px;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+            box-shadow: 0 6px 0 #8b6508, 0 10px 10px rgba(0,0,0,0.4);
             cursor: pointer;
-            transition: 0.2s;
+            text-align: center;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
         }
 
-        .nav-item.active, .nav-item:hover {
-            color: var(--gold-primary);
-            transform: scale(1.1);
+        .btn-gold:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #8b6508, 0 5px 5px rgba(0,0,0,0.4);
         }
 
-        .nav-icon {
-            font-size: 1.4rem;
-            margin-bottom: 2px;
-        }
-
-        /* Dashboard Screen */
-        #dashboard-screen {
-            background: radial-gradient(circle, #1e3c72 0%, #2a5298 100%);
-            display: flex;
-            flex-direction: column;
+        /* Hauptmenü (Dashboard) */
+        #menu-screen {
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
+            text-align: center;
+            background: radial-gradient(circle, #1a3a6b 0%, var(--bg-deep-blue) 100%);
         }
 
-        .table-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            position: relative;
-        }
-
-        .wooden-table {
-            background: linear-gradient(135deg, var(--wood-light), var(--wood-dark));
-            border: 8px solid #27140d;
-            border-radius: 30px;
-            width: 90%;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 15px 25px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.5);
-            position: relative;
+        .menu-logo-area {
+            margin-top: 20px;
         }
 
         .game-title {
-            font-size: 2.5rem;
+            font-size: 38px;
             font-weight: 900;
-            color: var(--gold-primary);
-            text-shadow: 3px 3px 0px #000, 0 0 15px rgba(255, 215, 0, 0.6);
-            text-align: center;
-            margin-bottom: 20px;
+            color: var(--gold-light);
+            text-shadow: 0 4px 0 var(--gold-dark), 0 8px 15px rgba(0,0,0,0.7);
             letter-spacing: 2px;
             font-style: italic;
         }
 
-        .play-btn {
-            background: linear-gradient(to bottom, #ffcc00, #ff6600);
-            border: 4px solid #fff;
-            border-radius: 40px;
-            color: white;
-            font-size: 1.8rem;
-            font-weight: 900;
-            padding: 15px 40px;
-            text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
-            box-shadow: 0 8px 0 #b33600, 0 15px 20px rgba(0,0,0,0.4);
-            cursor: pointer;
-            transition: all 0.1s ease;
+        .game-subtitle {
+            font-size: 14px;
+            color: #a0c4ff;
+            letter-spacing: 4px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
+            margin-top: 5px;
         }
 
-        .play-btn:active {
-            transform: translateY(6px);
-            box-shadow: 0 2px 0 #b33600, 0 5px 10px rgba(0,0,0,0.4);
-        }
-
-        .mode-selector {
+        .wood-table-card {
+            background: linear-gradient(135deg, var(--wood-light), var(--wood-dark));
+            border: 6px solid #3d2413;
+            border-radius: 30px;
+            padding: 30px 20px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6), inset 0 2px 5px rgba(255,255,255,0.2);
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
         }
 
-        .mode-pill {
-            background: rgba(0,0,0,0.4);
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .btn-menu {
+            background: linear-gradient(to bottom, #4a7bb0, #2b527d);
+            color: white;
             border: 2px solid var(--gold-primary);
-            padding: 8px 15px;
             border-radius: 15px;
-            font-size: 0.85rem;
+            padding: 12px;
+            font-size: 16px;
             font-weight: bold;
+            box-shadow: 0 4px 0 #132a45, 0 6px 10px rgba(0,0,0,0.3);
             cursor: pointer;
-            transition: 0.2s;
+            text-transform: uppercase;
         }
 
-        .mode-pill.selected {
-            background: var(--gold-gradient);
-            color: #000;
+        .btn-menu:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #132a45;
         }
 
-        /* Leagues Screen */
-        #leagues-screen {
-            padding: 15px;
-            background: linear-gradient(to bottom, #0f223f, #1a365d);
-        }
-
+        /* Liga-System */
         .league-header {
             text-align: center;
             margin-bottom: 15px;
         }
 
-        .league-header h2 {
+        .league-title {
+            font-size: 24px;
             color: var(--gold-primary);
-            font-size: 1.5rem;
             text-shadow: var(--text-shadow);
         }
 
-        .leaderboard {
-            flex: 1;
-            background: rgba(0,0,0,0.3);
+        .league-info-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--gold-dark);
             border-radius: 15px;
-            border: 2px solid #b8860b;
+            padding: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--gold-light);
+        }
+
+        .ranking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-grow: 1;
             overflow-y: auto;
-            padding: 10px;
         }
 
-        .leaderboard-item {
+        .ranking-item {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            background: rgba(255,255,255,0.05);
-            margin-bottom: 8px;
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(255,215,0,0.2);
+            align-items: center;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 10px 15px;
+            border-left: 5px solid #555;
         }
 
-        .leaderboard-item.promotion-zone {
-            background: rgba(46, 125, 50, 0.3);
-            border-color: #4caf50;
+        .ranking-item.promotion {
+            border-left-color: var(--accent-green);
+            background: rgba(56, 161, 105, 0.15);
         }
 
-        .leaderboard-item.current-user {
-            background: rgba(255, 215, 0, 0.2);
-            border-color: var(--gold-primary);
+        .ranking-item.current-user {
+            border: 2px solid var(--gold-primary);
+            background: rgba(243, 188, 60, 0.15);
         }
 
-        .rank-num {
-            font-weight: bold;
-            width: 30px;
-            font-size: 1.1rem;
-            color: var(--gold-primary);
-        }
-
-        .player-info {
+        .rank-info {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex: 1;
+            gap: 12px;
         }
 
-        .player-score {
+        .rank-pos {
             font-weight: bold;
-            color: #ffd700;
-        }
-
-        .promo-info {
-            background: #2e7d32;
-            color: white;
-            text-align: center;
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            margin-top: 10px;
-            font-weight: bold;
-            border: 1px solid #4caf50;
-        }
-
-        /* Generic Screens (Store/Friends) */
-        .generic-screen {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            font-size: 16px;
+            width: 20px;
             text-align: center;
         }
 
-        .generic-screen h2 {
-            color: var(--gold-primary);
-            margin-bottom: 10px;
+        .rank-name {
+            font-size: 15px;
+            font-weight: 500;
         }
 
-        /* Game Screen */
+        .rank-trophies {
+            font-size: 14px;
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        /* Spielfeld */
         #game-screen {
-            background: radial-gradient(circle, #1b4d3e 0%, #0f2d23 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
             padding: 10px;
-            position: relative;
+            background: radial-gradient(circle, #184e27 0%, #0d3819 100%);
+            border: 6px solid #2e1a0b;
+            justify-content: space-between;
         }
 
-        .game-table-felt {
-            flex: 1;
-            background: #1e6b4d;
-            border: 6px solid #8B4513;
-            border-radius: 15px;
+        .game-top-hud {
             display: flex;
-            flex-direction: column;
             justify-content: space-between;
-            padding: 10px;
-            position: relative;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            align-items: center;
+            background: rgba(0,0,0,0.4);
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 13px;
         }
 
-        .opponent-area, .player-game-area {
+        .opponent-area {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 5px;
         }
 
-        .hand-container {
+        .opponent-cards {
             display: flex;
-            gap: 5px;
-            min-height: 90px;
-            align-items: center;
-            justify-content: center;
+            gap: 4px;
         }
 
-        .table-cards-area {
+        .table-area {
+            flex-grow: 1;
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
             justify-content: center;
             align-items: center;
-            flex: 1;
+            gap: 10px;
             padding: 10px;
-            background: rgba(0,0,0,0.15);
-            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
             border: 2px dashed rgba(255,255,255,0.2);
-            margin: 5px 0;
-            max-height: 180px;
-            overflow-y: auto;
+            margin: 10px 0;
+            min-height: 140px;
         }
 
-        /* Card Design */
+        .player-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .player-hand {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        /* Neapolitanische Karten-Stile */
         .card {
-            width: 55px;
-            height: 85px;
-            background: white;
-            border-radius: 6px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            width: 65px;
+            height: 95px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 2px solid #222;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             padding: 4px;
-            color: #333;
-            font-weight: bold;
-            font-size: 0.9rem;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            position: relative;
-            border: 1px solid #ccc;
-        }
-
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 12px rgba(0,0,0,0.4);
-        }
-
-        .card.selected {
-            transform: translateY(-12px);
-            border: 2px solid var(--gold-primary);
-            box-shadow: 0 0 10px var(--gold-primary);
         }
 
         .card.back {
-            background: linear-gradient(135deg, #b71c1c, #d32f2f);
-            border: 2px solid #fff;
+            background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+            border: 2px solid #fef08a;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(254, 240, 138, 0.1) 10px, rgba(254, 240, 138, 0.1) 20px);
+        }
+
+        .card.selected {
+            transform: translateY(-15px);
+            box-shadow: 0 10px 15px rgba(243, 188, 60, 0.6);
+            border-color: var(--gold-primary);
+        }
+
+        .card-top {
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .card-center {
             display: flex;
             justify-content: center;
             align-items: center;
-            color: rgba(255,255,255,0.2);
+            font-size: 22px;
+            flex-grow: 1;
         }
 
-        .card.red { color: #d32f2f; }
-        .card.blue { color: #1565c0; }
-        .card.yellow { color: #f57f17; }
-        .card.green { color: #2e7d32; }
+        .card.denari { color: #b45309; }
+        .card.coppe { color: #dc2626; }
+        .card.spade { color: #1e3a8a; }
+        .card.bastoni { color: #166534; }
 
-        .game-info-bar {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            background: rgba(0,0,0,0.4);
-            padding: 4px 8px;
-            border-radius: 5px;
-        }
-
-        .action-btn {
-            background: var(--gold-gradient);
-            border: 2px solid #fff;
-            color: #000;
-            font-weight: bold;
-            padding: 6px 12px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-
-        .back-btn {
-            background: #c62828;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-
-        /* Modal Overlay */
-        .modal {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
+        /* Modal / Dialog overlays */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
             display: none;
             justify-content: center;
             align-items: center;
@@ -501,427 +410,383 @@
         }
 
         .modal-content {
-            background: #1a365d;
+            background: var(--bg-deep-blue);
             border: 4px solid var(--gold-primary);
-            padding: 25px;
             border-radius: 20px;
-            text-align: center;
+            padding: 25px;
             width: 85%;
+            max-width: 350px;
+            text-align: center;
             box-shadow: 0 10px 25px rgba(0,0,0,0.8);
         }
 
-        .modal-content h2 {
-            color: var(--gold-primary);
+        .modal-title {
+            font-size: 22px;
+            color: var(--gold-light);
             margin-bottom: 15px;
+        }
+
+        .mode-select-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--gold-light);
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-<div id="app-container">
+    <div id="app-container">
 
-    <!-- Top Bar (Visible on main screens) -->
-    <div class="top-bar" id="global-top-bar">
-        <div class="profile-container">
-            <div class="avatar-frame">
-                👤
-                <div class="level-badge">12</div>
-            </div>
-            <div>
-                <div style="font-size: 0.85rem; font-weight: bold;">MarcoP</div>
-                <div style="font-size: 0.7rem; color: #ffd700;">Gold Rang</div>
-            </div>
-        </div>
-        <div class="currencies">
-            <div class="currency-pill">
-                <div class="currency-icon coin-icon">🪙</div>
-                <span id="coin-count">12.450</span>
-            </div>
-            <div class="currency-pill">
-                <div class="currency-icon gem-icon">💎</div>
-                <span id="gem-count">145</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- 1. DASHBOARD SCREEN -->
-    <div id="dashboard-screen" class="screen active">
-        <div class="table-area">
-            <div class="wooden-table">
-                <h1 class="game-title">SCOPA<br><span style="font-size: 1.5rem; color: #fff;">LA SFIDA</span></h1>
-                
-                <div class="mode-selector" style="margin-bottom: 15px;">
-                    <div class="mode-pill selected" onclick="setGameMode('1v1', this)">1v1 Duell</div>
-                    <div class="mode-pill" onclick="setGameMode('2v2', this)">2v2 Scopone</div>
+        <!-- 1. HAUPTMENÜ (DASHBOARD) -->
+        <div id="menu-screen" class="screen active">
+            <div class="top-bar">
+                <div class="profile-area">
+                    <div class="avatar">👑</div>
+                    <span id="player-name-display" style="font-weight: bold; font-size: 14px;">Marco</span>
                 </div>
-
-                <button class="play-btn" onclick="startGame()">JETZT SPIELEN</button>
+                <div class="currencies">
+                    <div class="currency-badge">🪙 <span id="coin-count">1,250</span></div>
+                    <div class="currency-badge">💎 <span id="gem-count">45</span></div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <!-- 2. LEAGUES SCREEN -->
-    <div id="leagues-screen" class="screen">
-        <div class="league-header">
-            <h2>🏆 Gold-Liga Rangliste</h2>
-            <p style="font-size: 0.8rem; color: #aaa;">Saison endet in: 2 Tagen</p>
-        </div>
-        
-        <div class="leaderboard" id="leaderboard-list">
-            <!-- Dynamisch gefüllt -->
-        </div>
+            <div class="menu-logo-area">
+                <h1 class="game-title">SCOPA</h1>
+                <div class="game-subtitle">La Sfida</div>
+            </div>
 
-        <div class="promo-info">
-            ✨ Die ersten 3 Positionen steigen in die Diamant-Liga auf!
-        </div>
-    </div>
+            <div class="wood-table-card">
+                <div style="font-size: 15px; color: var(--gold-light); font-weight: bold;">Bereit für das Duell?</div>
+                <button class="btn-gold" id="btn-open-mode-select" style="font-size: 18px; width: 100%;">JETZT SPIELEN</button>
+            </div>
 
-    <!-- 3. STORE SCREEN -->
-    <div id="store-screen" class="screen generic-screen">
-        <h2>🛒 Store & Angebote</h2>
-        <p style="color: #aaa; margin-bottom: 20px;">Hole dir Münzen und exklusive neapolitanische Kartendecks!</p>
-        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; border: 2px solid #b8860b;">
-            <p style="font-weight: bold; color: var(--gold-primary);">Mega Münz-Paket</p>
-            <p style="font-size: 0.9rem; margin: 10px 0;">50.000 Münzen + 50 Edelsteine</p>
-            <button class="action-btn" onclick="alert('Kauf erfolgreich simulieren!')">Für 4,99 € kaufen</button>
-        </div>
-    </div>
-
-    <!-- 4. FRIENDS SCREEN -->
-    <div id="friends-screen" class="screen generic-screen">
-        <h2>👥 Freunde & Club</h2>
-        <p style="color: #aaa; margin-bottom: 20px;">Lade Freunde ein und spiele private Matches.</p>
-        <button class="action-btn" onclick="alert('Freundeslink kopiert!')">Freund einladen</button>
-    </div>
-
-    <!-- 5. GAMEPLAY SCREEN -->
-    <div id="game-screen" class="screen">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 0;">
-            <button class="back-btn" onclick="returnToDashboard()">Aufgeben</button>
-            <div class="game-info-bar">
-                <span id="turn-indicator">Am Zug: Du</span> | Modus: <span id="current-mode-label">1v1</span>
+            <div class="menu-buttons">
+                <button class="btn-menu" onclick="switchScreen('league-screen')">🏆 Liga-System</button>
+                <button class="btn-menu" onclick="alert('Store ist in dieser Demo-Version direkt verfügbar.')">🛒 Store & Extras</button>
             </div>
         </div>
 
-        <div class="game-table-felt">
-            <!-- Gegner Bereich -->
+        <!-- 2. LIGA-SYSTEM (RANGLISTE) -->
+        <div id="league-screen" class="screen">
+            <div class="league-header">
+                <h2 class="league-title">🏆 Gold-Liga</h2>
+            </div>
+
+            <div class="league-info-card">
+                Ende der Saison in: <b>2 Tage 14 Std</b><br>
+                <span style="color: #6ee7b7;">⭐ Die ersten 3 Positionen steigen auf!</span>
+            </div>
+
+            <div class="ranking-list" id="ranking-container">
+                <!-- Dynamisch gefüllt via JS -->
+            </div>
+
+            <button class="btn-menu" onclick="switchScreen('menu-screen')">Zurück zum Menü</button>
+        </div>
+
+        <!-- 3. SPIELFELD -->
+        <div id="game-screen" class="screen">
+            <div class="game-top-hud">
+                <span id="game-mode-title">1 vs 1 KI</span>
+                <span>Punkte: <b id="score-display">Du: 0 | Gegner: 0</b></span>
+                <button onclick="switchScreen('menu-screen')" style="background:none; border:none; color:white; font-size:16px; cursor:pointer;">✖</button>
+            </div>
+
+            <!-- Gegner-Bereich -->
             <div class="opponent-area">
-                <div style="font-size: 0.75rem;" id="opponent-name">Gegner (KI)</div>
-                <div class="hand-container" id="opponent-hand">
-                    <!-- Karten verdeckt -->
+                <span id="opponent-name" style="font-size: 13px; color: #cbd5e1;">Gegner (KI)</span>
+                <div class="opponent-cards" id="opponent-hand-container">
+                    <!-- Karten-Rückseiten -->
                 </div>
             </div>
 
-            <!-- Tisch Mitte -->
-            <div class="table-cards-area" id="table-cards">
-                <!-- Auf dem Tisch liegende Karten -->
+            <!-- Tisch-Bereich -->
+            <div class="table-area" id="table-container">
+                <!-- Tischkarten -->
             </div>
 
-            <!-- Eigener Bereich -->
-            <div class="player-game-area">
-                <div class="hand-container" id="player-hand">
-                    <!-- Spieler Handkarten -->
-                </div>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <div style="font-size: 0.75rem;">Deine Punkte: <span id="player-game-score">0</span></div>
-                    <button class="action-btn" id="play-move-btn" onclick="executePlayerMove()">Karte spielen</button>
+            <!-- Spieler-Bereich -->
+            <div class="player-area">
+                <span style="font-size: 13px; color: var(--gold-light);">Deine Handkarten (Tippe zum Auswählen)</span>
+                <div class="player-hand" id="player-hand-container">
+                    <!-- Handkarten -->
                 </div>
             </div>
         </div>
+
     </div>
 
-    <!-- Bottom Navigation Bar -->
-    <div class="bottom-nav" id="global-bottom-nav">
-        <button class="nav-item active" onclick="switchScreen('dashboard-screen', this)">
-            <span class="nav-icon">🏠</span>
-            <span>Menü</span>
-        </button>
-        <button class="nav-item" onclick="switchScreen('leagues-screen', this)">
-            <span class="nav-icon">🏆</span>
-            <span>Ligen</span>
-        </button>
-        <button class="nav-item" onclick="switchScreen('store-screen', this)">
-            <span class="nav-icon">🛒</span>
-            <span>Store</span>
-        </button>
-        <button class="nav-item" onclick="switchScreen('friends-screen', this)">
-            <span class="nav-icon">👥</span>
-            <span>Freunde</span>
-        </button>
-    </div>
-
-    <!-- End Game Modal -->
-    <div class="modal" id="game-over-modal">
+    <!-- MODAL: MODUS-AUSWAHL -->
+    <div class="modal-overlay" id="mode-modal">
         <div class="modal-content">
-            <h2 id="modal-title">Spiel beendet!</h2>
-            <p id="modal-text" style="margin-bottom: 20px;">Du hast gewonnen und 500 Münzen erhalten!</p>
-            <button class="play-btn" style="font-size: 1.2rem; padding: 10px 20px;" onclick="returnToDashboard()">Zurück zum Menü</button>
+            <div class="modal-title">Wähle den Modus</div>
+            <div class="mode-select-buttons">
+                <button class="btn-gold" onclick="startGame('1v1')">1 vs 1 gegen KI</button>
+                <button class="btn-gold" onclick="startGame('scopone')">Scopone (2 vs 2)</button>
+            </div>
+            <button class="back-btn" onclick="closeModeModal()">Abbrechen</button>
         </div>
     </div>
 
-</div>
+    <!-- MODAL: SPIELENDE / SCOPA INFO -->
+    <div class="modal-overlay" id="info-modal">
+        <div class="modal-content">
+            <div class="modal-title" id="info-modal-title">Meldung</div>
+            <p id="info-modal-text" style="margin-bottom: 20px; font-size: 14px;"></p>
+            <button class="btn-gold" onclick="closeInfoModal()">Weiter</button>
+        </div>
+    </div>
 
-<script>
-    // --- Spielzustand & Daten ---
-    let currentGameMode = '1v1';
-    let selectedHandCard = null;
-    let selectedTableCards = [];
-    let playerCoins = 12450;
+    <script>
+        // Spiel-Zustand & Daten
+        const suits = ['denari', 'coppe', 'spade', 'bastoni'];
+        const suitSymbols = { denari: '🪙', coppe: '🏆', spade: '🗡️', bastoni: '🪵' };
+        let playerCoins = 1250;
+        let playerGems = 45;
+        
+        let gameState = {
+            mode: '1v1',
+            playerHand: [],
+            opponentHand: [],
+            tableCards: [],
+            selectedCard: null,
+            playerScore: 0,
+            opponentScore: 0
+        };
 
-    const suits = ['Denari', 'Coppe', 'Spade', 'Bastoni'];
-    const suitIcons = { 'Denari': '🪙', 'Coppe': '🏆', 'Spade': '⚔️', 'Bastoni': '🪵' };
-    const suitColors = { 'Denari': 'yellow', 'Coppe': 'red', 'Spade': 'blue', 'Bastoni': 'green' };
-
-    let deck = [];
-    let playerHand = [];
-    let opponentHand = [];
-    let tableCards = [];
-    let playerCaptured = [];
-    let opponentCaptured = [];
-
-    // --- Navigation ---
-    function switchScreen(screenId, element) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        if(element) element.classList.add('active');
-
-        const topBar = document.getElementById('global-top-bar');
-        const bottomNav = document.getElementById('global-bottom-nav');
-
-        if(screenId === 'game-screen') {
-            topBar.style.display = 'none';
-            bottomNav.style.display = 'none';
-        } else {
-            topBar.style.display = 'flex';
-            bottomNav.style.display = 'flex';
-            if(screenId === 'leagues-screen') loadLeaderboard();
-        }
-    }
-
-    function setGameMode(mode, element) {
-        currentGameMode = mode;
-        document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove('selected'));
-        element.classList.add('selected');
-    }
-
-    function returnToDashboard() {
-        document.getElementById('game-over-modal').style.display = 'none';
-        switchScreen('dashboard-screen', document.querySelector('.nav-item'));
-    }
-
-    // --- Rangliste (Ligen) ---
-    function loadLeaderboard() {
-        const list = document.getElementById('leaderboard-list');
-        list.innerHTML = '';
-        const players = [
-            { rank: 1, name: "Luigi_Pro", score: "3.420 Pkt", promo: true },
-            { rank: 2, name: "Sofia_Napoli", score: "3.100 Pkt", promo: true },
-            { rank: 3, name: "MarcoP (Du)", score: "2.950 Pkt", promo: true, user: true },
-            { rank: 4, name: "Giovanni99", score: "2.800 Pkt", promo: false },
-            { rank: 5, name: "Alessia_Cards", score: "2.650 Pkt", promo: false },
-            { rank: 6, name: "Don_Vito", score: "2.400 Pkt", promo: false }
+        // Ranglisten-Daten für das Liga-System
+        const rankingData = [
+            { rank: 1, name: "Luigi_Pro", trophies: 1420, promotion: true },
+            { rank: 2, name: "Sofia_Scopa", trophies: 1380, promotion: true },
+            { rank: 3, name: "Marco (Du)", trophies: 1290, promotion: true, current: true },
+            { rank: 4, name: "Giovanni99", trophies: 1210, promotion: false },
+            { rank: 5, name: "NonnaBeppa", trophies: 1150, promotion: false },
+            { rank: 6, name: "Matteo_RM", trophies: 1080, promotion: false },
+            { rank: 7, name: "CardShark", trophies: 990, promotion: false }
         ];
 
-        players.forEach(p => {
-            const item = document.createElement('div');
-            item.className = `leaderboard-item ${p.promo ? 'promotion-zone' : ''} ${p.user ? 'current-user' : ''}`;
-            item.innerHTML = `
-                <div class="rank-num">#${p.rank}</div>
-                <div class="player-info">
-                    <span>👤</span>
-                    <span>${p.name}</span>
-                </div>
-                <div class="player-score">${p.score}</div>
-            `;
-            list.appendChild(item);
-        });
-    }
+        // Navigation / Screen-Manager (Kein Überlappen)
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
 
-    // --- Scopa Spiellogik ---
-    function startGame() {
-        switchScreen('game-screen', null);
-        document.getElementById('current-mode-label').innerText = currentGameMode;
-        initNewGameRound();
-    }
-
-    function createDeck() {
-        let d = [];
-        suits.forEach(suit => {
-            for(let i = 1; i <= 10; i++) {
-                d.push({ suit: suit, value: i, name: getCardName(i) });
+            if (screenId === 'league-screen') {
+                renderRanking();
             }
-        });
-        // Mischen
-        return d.sort(() => Math.random() - 0.5);
-    }
-
-    function getCardName(val) {
-        if(val === 1) return 'Ace';
-        if(val === 8) return 'Fante';
-        if(val === 9) return 'Cavallo';
-        if(val === 10) return 'Re';
-        return val.toString();
-    }
-
-    function initNewGameRound() {
-        deck = createDeck();
-        playerHand = deck.splice(0, 3);
-        opponentHand = deck.splice(0, 3);
-        tableCards = deck.splice(0, 4);
-        playerCaptured = [];
-        opponentCaptured = [];
-        selectedHandCard = null;
-        selectedTableCards = [];
-
-        renderGameTable();
-    }
-
-    function renderGameTable() {
-        // Gegner Karten (verdeckt)
-        const oppHandEl = document.getElementById('opponent-hand');
-        oppHandEl.innerHTML = '';
-        opponentHand.forEach(() => {
-            const card = document.createElement('div');
-            card.className = 'card back';
-            card.innerHTML = '♠';
-            oppHandEl.appendChild(card);
-        });
-
-        // Tisch Karten
-        const tableEl = document.getElementById('table-cards');
-        tableEl.innerHTML = '';
-        tableCards.forEach((c, index) => {
-            const card = document.createElement('div');
-            const colorClass = suitColors[c.suit];
-            card.className = `card ${colorClass} ${selectedTableCards.includes(index) ? 'selected' : ''}`;
-            card.innerHTML = `
-                <div>${c.name}<br>${suitIcons[c.suit]}</div>
-                <div style="font-size: 1.2rem; text-align: center;">${suitIcons[c.suit]}</div>
-                <div style="transform: rotate(180deg);">${c.name}<br>${suitIcons[c.suit]}</div>
-            `;
-            card.onclick = () => toggleTableCardSelection(index);
-            tableEl.appendChild(card);
-        });
-
-        // Spieler Hand
-        const playerHandEl = document.getElementById('player-hand');
-        playerHandEl.innerHTML = '';
-        playerHand.forEach((c, index) => {
-            const card = document.createElement('div');
-            const colorClass = suitColors[c.suit];
-            card.className = `card ${colorClass} ${selectedHandCard === index ? 'selected' : ''}`;
-            card.innerHTML = `
-                <div>${c.name}<br>${suitIcons[c.suit]}</div>
-                <div style="font-size: 1.2rem; text-align: center;">${suitIcons[c.suit]}</div>
-                <div style="transform: rotate(180deg);">${c.name}<br>${suitIcons[c.suit]}</div>
-            `;
-            card.onclick = () => selectPlayerHandCard(index);
-            playerHandEl.appendChild(card);
-        });
-
-        document.getElementById('player-game-score').innerText = playerCaptured.length;
-    }
-
-    function selectPlayerHandCard(index) {
-        selectedHandCard = index;
-        selectedTableCards = []; // Reset Tisch-Auswahl bei Handkarten-Wechsel
-        renderGameTable();
-    }
-
-    function toggleTableCardSelection(index) {
-        const pos = selectedTableCards.indexOf(index);
-        if(pos > -1) {
-            selectedTableCards.splice(pos, 1);
-        } else {
-            selectedTableCards.push(index);
-        }
-        renderGameTable();
-    }
-
-    function executePlayerMove() {
-        if(selectedHandCard === null) {
-            alert('Wähle zuerst eine Karte von deiner Hand aus!');
-            return;
         }
 
-        const playedCard = playerHand[selectedHandCard];
+        // Modus-Modal Steuerung
+        document.getElementById('btn-open-mode-select').addEventListener('click', () => {
+            document.getElementById('mode-modal').style.display = 'flex';
+        });
 
-        // Prüfe ob gültiger Zug (Entweder exakter Wert oder Summe)
-        if(selectedTableCards.length > 0) {
-            const sum = selectedTableCards.reduce((acc, idx) => acc + tableCards[idx].value, 0);
-            if(sum === playedCard.value) {
-                // Gültiger Zug: Nimm Karten vom Tisch
-                playerCaptured.push(playedCard);
-                selectedTableCards.sort((a,b) => b - a).forEach(idx => {
-                    playerCaptured.push(tableCards.splice(idx, 1)[0]);
-                });
-                playerHand.splice(selectedHandCard, 1);
-                
-                // Zug beendet -> Gegner ist dran
-                aiTurn();
+        function closeModeModal() {
+            document.getElementById('mode-modal').style.display = 'none';
+        }
+
+        function closeInfoModal() {
+            document.getElementById('info-modal').style.display = 'none';
+        }
+
+        function showInfoModal(title, text) {
+            document.getElementById('info-modal-title').innerText = title;
+            document.getElementById('info-modal-text').innerText = text;
+            document.getElementById('info-modal').style.display = 'flex';
+        }
+
+        // Rangliste rendern
+        function renderRanking() {
+            const container = document.getElementById('ranking-container');
+            container.innerHTML = '';
+            rankingData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `ranking-item ${item.promotion ? 'promotion' : ''} ${item.current ? 'current-user' : ''}`;
+                div.innerHTML = `
+                    <div class="rank-info">
+                        <span class="rank-pos">#${item.rank}</span>
+                        <span class="rank-name">${item.name}</span>
+                    </div>
+                    <span class="rank-trophies">🏆 ${item.trophies}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Deck-Erstellung (Neapolitanische Karten 1-10)
+        function createDeck() {
+            let deck = [];
+            suits.forEach(suit => {
+                for (let value = 1; value <= 10; value++) {
+                    deck.push({ suit, value, id: `${suit}-${value}` });
+                }
+            });
+            return deck.sort(() => Math.random() - 0.5);
+        }
+
+        // Spiel starten
+        function startGame(mode) {
+            closeModeModal();
+            gameState.mode = mode;
+            document.getElementById('game-mode-title').innerText = mode === '1v1' ? '1 vs 1 gegen KI' : 'Scopone (2 vs 2)';
+            
+            let deck = createDeck();
+            
+            // Karten verteilen
+            gameState.tableCards = deck.splice(0, 4);
+            gameState.playerHand = deck.splice(0, 3);
+            gameState.opponentHand = deck.splice(0, 3);
+            gameState.selectedCard = null;
+            gameState.playerScore = 0;
+            gameState.opponentScore = 0;
+
+            switchScreen('game-screen');
+            renderGame();
+        }
+
+        // Spielfeld rendern
+        function renderGame() {
+            // Gegner Hand (Rückseiten)
+            const oppContainer = document.getElementById('opponent-hand-container');
+            oppContainer.innerHTML = '';
+            gameState.opponentHand.forEach(() => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card back';
+                oppContainer.appendChild(cardEl);
+            });
+
+            // Tischkarten
+            const tableContainer = document.getElementById('table-container');
+            tableContainer.innerHTML = '';
+            if (gameState.tableCards.length === 0) {
+                tableContainer.innerHTML = '<span style="font-size:13px; color:rgba(255,255,255,0.6);">Tisch ist leer! (SCOPA?)</span>';
             } else {
-                alert('Die Summe der Tischkarten stimmt nicht mit dem Kartenwert überein!');
+                gameState.tableCards.forEach(card => {
+                    const cardEl = createCardElement(card, () => handleTableCardClick(card));
+                    tableContainer.appendChild(cardEl);
+                });
             }
-        } else {
-            // Keine Tischkarte ausgewählt -> Karte einfach ablegen
-            if(tableCards.some(c => c.value === playedCard.value)) {
-                alert('Du musst eine Karte nehmen, wenn eine Karte gleichen Werts auf dem Tisch liegt!');
+
+            // Spieler Hand
+            const playerContainer = document.getElementById('player-hand-container');
+            playerContainer.innerHTML = '';
+            gameState.playerHand.forEach(card => {
+                const cardEl = createCardElement(card, () => handlePlayerCardClick(card));
+                if (gameState.selectedCard && gameState.selectedCard.id === card.id) {
+                    cardEl.classList.add('selected');
+                }
+                playerContainer.appendChild(cardEl);
+            });
+
+            document.getElementById('score-display').innerText = `Du: ${gameState.playerScore} | Gegner: ${gameState.opponentScore}`;
+        }
+
+        // Einzelne Karte als HTML-Element generieren
+        function createCardElement(card, onClick) {
+            const el = document.createElement('div');
+            el.className = `card ${card.suit}`;
+            
+            let displayVal = card.value;
+            if (card.value === 1) displayVal = 'A';
+            if (card.value === 8) displayVal = 'F';
+            if (card.value === 9) displayVal = 'C';
+            if (card.value === 10) displayVal = 'R';
+
+            el.innerHTML = `
+                <div class="card-top">${displayVal}</div>
+                <div class="card-center">${suitSymbols[card.suit]}</div>
+                <div class="card-top" style="transform: rotate(180deg);">${displayVal}</div>
+            `;
+            el.addEventListener('click', onClick);
+            return el;
+        }
+
+        // Handkarte auswählen
+        function handlePlayerCardClick(card) {
+            if (gameState.selectedCard && gameState.selectedCard.id === card.id) {
+                gameState.selectedCard = null; // Abwählen
+            } else {
+                gameState.selectedCard = card;
+            }
+            renderGame();
+        }
+
+        // Tischkarte anklicken (Einsammel-Versuch)
+        function handleTableCardClick(tableCard) {
+            if (!gameState.selectedCard) {
+                showInfoModal('Hinweis', 'Wähle zuerst eine deiner Handkarten aus!');
                 return;
             }
-            tableCards.push(playedCard);
-            playerHand.splice(selectedHandCard, 1);
-            aiTurn();
-        }
 
-        selectedHandCard = null;
-        selectedTableCards = [];
-        renderGameTable();
+            const pCard = gameState.selectedCard;
+            
+            // Scopa Logik: Entweder exakter Wert ODER Summenregel
+            if (pCard.value === tableCard.value) {
+                // Direkter Treffer
+                gameState.tableCards = gameState.tableCards.filter(c => c.id !== tableCard.id);
+                gameState.playerHand = gameState.playerHand.filter(c => c.id !== pCard.id);
+                
+                if (gameState.tableCards.length === 0) {
+                    gameState.playerScore += 1;
+                    showInfoModal('¡SCOPA!', 'Du hast alle Karten abgeräumt und einen Punkt erhalten!');
+                } else {
+                    showInfoModal('Eingesammelt', `Du hast ${pCard.value} gegen ${tableCard.value} genommen.`);
+                }
 
-        // Prüfe Rundenende
-        if(playerHand.length === 0 && opponentHand.length === 0) {
-            if(deck.length > 0) {
-                playerHand = deck.splice(0, 3);
-                opponentHand = deck.splice(0, 3);
-                renderGameTable();
+                gameState.selectedCard = null;
+                checkRoundEnd();
             } else {
-                endGame();
+                showInfoModal('Ungültiger Zug', 'Die Werte stimmen nicht überein! (Klassische Scopa-Regel: Werte müssen matchen).');
             }
         }
-    }
 
-    function aiTurn() {
-        document.getElementById('turn-indicator').innerText = 'Am Zug: Gegner denkt...';
-        setTimeout(() => {
-            if(opponentHand.length > 0) {
-                const aiCard = opponentHand.pop();
-                // Einfache KI: Legt ab oder nimmt erste passende Karte
-                let matchIndex = tableCards.findIndex(c => c.value === aiCard.value);
-                if(matchIndex > -1) {
-                    opponentCaptured.push(aiCard, tableCards.splice(matchIndex, 1)[0]);
+        // Prüfen ob Runde vorbei ist, sonst KI Zug
+        function checkRoundEnd() {
+            renderGame();
+            if (gameState.playerHand.length === 0) {
+                if (gameState.opponentHand.length > 0) {
+                    // KI Zug ausführen
+                    setTimeout(aiTurn, 800);
                 } else {
-                    tableCards.push(aiCard);
+                    showInfoModal('Rundenende', `Das Spiel ist vorbei! Endstand - Du: ${gameState.playerScore}, Gegner: ${gameState.opponentScore}`);
+                    switchScreen('menu-screen');
                 }
             }
-            document.getElementById('turn-indicator').innerText = 'Am Zug: Du';
-            renderGameTable();
-        }, 1000);
-    }
-
-    function endGame() {
-        const modal = document.getElementById('game-over-modal');
-        const text = document.getElementById('modal-text');
-        if(playerCaptured.length >= opponentCaptured.length) {
-            playerCoins += 300;
-            document.getElementById('coin-count').innerText = playerCoins.toLocaleString();
-            text.innerText = 'Herzlichen Glückwunsch! Du hast das Match gewonnen und +300 Münzen erhalten.';
-        } else {
-            text.innerText = 'Schade! Der Gegner hat dieses Match gewonnen. Probiere es noch einmal!';
         }
-        modal.style.display = 'flex';
-    }
-</script>
 
+        // Einfache KI-Logik
+        function aiTurn() {
+            if (gameState.opponentHand.length === 0) return;
+            
+            // KI wählt zufällige Karte
+            const aiCard = gameState.opponentHand[Math.floor(Math.random() * gameState.opponentHand.length)];
+            gameState.opponentHand = gameState.opponentHand.filter(c => c.id !== aiCard.id);
+
+            // Prüfen ob KI passende Tischkarte findet
+            const matchIndex = gameState.tableCards.findIndex(c => c.value === aiCard.value);
+            if (matchIndex !== -1) {
+                gameState.tableCards.splice(matchIndex, 1);
+                if (gameState.tableCards.length === 0) {
+                    gameState.opponentScore += 1;
+                }
+            } else {
+                // Karte einfach auf den Tisch legen
+                gameState.tableCards.push(aiCard);
+            }
+            renderGame();
+        }
+    </script>
 </body>
 </html>
