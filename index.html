@@ -3,1061 +3,925 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scopa & Scopone Cartoon Arena</title>
-    <!-- Google Fonts für einen modernen Cartoon-Look -->
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Scopa: La Sfida</title>
     <style>
         :root {
-            --bg-color: #1a1a2e;
-            --table-color: #2e8b57;
-            --table-border: #1e5f38;
-            --primary: #ff4757;
-            --primary-hover: #ff6b81;
-            --secondary: #2ed573;
-            --accent: #ffa502;
-            --info: #1e90ff;
-            --purple: #9b59b6;
-            --dark: #2f3542;
-            --light: #f1f2f6;
-            --card-radius: 12px;
-            --ui-radius: 20px;
+            --bg-deep-blue: #0b1d3a;
+            --bg-pattern-blue: #142d56;
+            --gold-primary: #ffd700;
+            --gold-gradient: linear-gradient(135deg, #ffe600 0%, #ff9900 100%);
+            --wood-dark: #3e2723;
+            --wood-light: #5d4037;
+            --accent-green: #2e7d32;
+            --accent-red: #c62828;
+            --text-shadow: 0 2px 4px rgba(0,0,0,0.6);
         }
 
         * {
             box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            font-family: 'Fredoka', cursive, sans-serif;
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--light);
-            overflow: hidden;
+            background-color: var(--bg-deep-blue);
+            background-image: 
+                linear-gradient(45deg, var(--bg-pattern-blue) 25%, transparent 25%), 
+                linear-gradient(-45deg, var(--bg-pattern-blue) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, var(--bg-pattern-blue) 75%), 
+                linear-gradient(-45deg, transparent 75%, var(--bg-pattern-blue) 75%);
+            background-size: 40px 40px;
+            background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+            color: #ffffff;
             height: 100vh;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        #app {
+        #app-container {
             width: 100%;
             max-width: 480px;
             height: 100%;
             max-height: 850px;
-            background: linear-gradient(135deg, #16213e, #0f3460);
+            background: rgba(11, 29, 58, 0.95);
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            display: flex;
-            flex-direction: column;
             overflow: hidden;
+            border: 4px solid #b8860b;
         }
 
-        @media (min-width: 481px) {
-            #app {
-                border-radius: 30px;
-                border: 6px solid #4e5d6c;
-            }
-        }
-
-        /* Screens */
         .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
+            display: none;
+            flex: 1;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 20px;
-            transition: opacity 0.3s ease;
-            z-index: 10;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-        }
-
-        .screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* Cartoon Elemente & Buttons */
-        h1, h2, h3 {
-            text-align: center;
-            text-shadow: 3px 3px 0px #000;
-        }
-
-        h1 { font-size: 2.5rem; color: var(--accent); margin-bottom: 5px; }
-        h2 { font-size: 1.8rem; color: var(--secondary); }
-
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--ui-radius);
-            padding: 15px 25px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #b33939, 0 10px 10px rgba(0,0,0,0.3);
-            transition: all 0.1s ease;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 8px 0;
-            width: 100%;
-        }
-
-        .btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 2px 0 #b33939, 0 5px 5px rgba(0,0,0,0.3);
-        }
-
-        .btn-green { background-color: var(--secondary); box-shadow: 0 6px 0 #218c53; }
-        .btn-green:active { box-shadow: 0 2px 0 #218c53; }
-
-        .btn-blue { background-color: var(--info); box-shadow: 0 6px 0 #0970d7; }
-        .btn-blue:active { box-shadow: 0 2px 0 #0970d7; }
-
-        .btn-purple { background-color: var(--purple); box-shadow: 0 6px 0 #71368a; }
-        .btn-purple:active { box-shadow: 0 2px 0 #71368a; }
-
-        /* Menu / Hauptmenü */
-        .logo-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .cartoon-trophy {
-            font-size: 5rem;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        /* Liga & Rang UI */
-        .league-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: var(--ui-radius);
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            border: 3px solid rgba(255,255,255,0.2);
-        }
-
-        .league-info h3 { font-size: 1.3rem; text-align: left; text-shadow: none; color: var(--accent); }
-        .league-info p { font-size: 0.9rem; color: #ccc; }
-        
-        .progress-bar-container {
-            background: rgba(0,0,0,0.5);
-            border-radius: 10px;
-            height: 15px;
-            width: 100%;
-            margin-top: 8px;
+            position: relative;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-
-        .progress-bar {
-            background: var(--secondary);
             height: 100%;
-            width: 0%;
-            transition: width 0.5s ease;
         }
 
-        /* Spieltisch */
-        #game-screen {
-            background: radial-gradient(circle, #38ada4, var(--table-color));
-            padding: 10px;
+        .screen.active {
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
         }
 
-        .table-header {
+        /* Top Bar */
+        .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(0,0,0,0.3);
-            padding: 8px 15px;
-            border-radius: 15px;
-            font-size: 0.9rem;
+            padding: 10px 15px;
+            background: linear-gradient(to bottom, #1a365d, #0f223f);
+            border-bottom: 3px solid #b8860b;
+            z-index: 10;
         }
 
-        .opponent-area {
+        .profile-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar-frame {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--gold-gradient);
+            border: 2px solid #fff;
             display: flex;
             justify-content: center;
-            gap: 5px;
-            min-height: 75px;
             align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #333;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            position: relative;
         }
 
-        .center-table {
-            background: rgba(0, 0, 0, 0.25);
-            border: 4px dashed rgba(255, 255, 255, 0.3);
-            border-radius: var(--ui-radius);
-            flex-grow: 1;
-            margin: 10px 0;
+        .level-badge {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: #ff4500;
+            color: white;
+            font-size: 0.7rem;
+            padding: 1px 5px;
+            border-radius: 10px;
+            border: 1px solid #fff;
+            font-weight: bold;
+        }
+
+        .currencies {
+            display: flex;
+            gap: 10px;
+        }
+
+        .currency-pill {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #b8860b;
+            border-radius: 20px;
+            padding: 4px 10px 4px 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .currency-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.7rem;
+        }
+
+        .coin-icon { background: gold; color: #7a5200; }
+        .gem-icon { background: #00ffff; color: #005555; }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            background: linear-gradient(to top, #1a365d, #0f223f);
+            border-top: 3px solid #b8860b;
+            padding: 10px 0;
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #aaa;
+            font-size: 0.75rem;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-item.active, .nav-item:hover {
+            color: var(--gold-primary);
+            transform: scale(1.1);
+        }
+
+        .nav-icon {
+            font-size: 1.4rem;
+            margin-bottom: 2px;
+        }
+
+        /* Dashboard Screen */
+        #dashboard-screen {
+            background: radial-gradient(circle, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .table-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            position: relative;
+        }
+
+        .wooden-table {
+            background: linear-gradient(135deg, var(--wood-light), var(--wood-dark));
+            border: 8px solid #27140d;
+            border-radius: 30px;
+            width: 90%;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--gold-primary);
+            text-shadow: 3px 3px 0px #000, 0 0 15px rgba(255, 215, 0, 0.6);
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            font-style: italic;
+        }
+
+        .play-btn {
+            background: linear-gradient(to bottom, #ffcc00, #ff6600);
+            border: 4px solid #fff;
+            border-radius: 40px;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 900;
+            padding: 15px 40px;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 0 #b33600, 0 15px 20px rgba(0,0,0,0.4);
+            cursor: pointer;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .play-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #b33600, 0 5px 10px rgba(0,0,0,0.4);
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mode-pill {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid var(--gold-primary);
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .mode-pill.selected {
+            background: var(--gold-gradient);
+            color: #000;
+        }
+
+        /* Leagues Screen */
+        #leagues-screen {
+            padding: 15px;
+            background: linear-gradient(to bottom, #0f223f, #1a365d);
+        }
+
+        .league-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .league-header h2 {
+            color: var(--gold-primary);
+            font-size: 1.5rem;
+            text-shadow: var(--text-shadow);
+        }
+
+        .leaderboard {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            border: 2px solid #b8860b;
+            overflow-y: auto;
             padding: 10px;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.05);
+            margin-bottom: 8px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+
+        .leaderboard-item.promotion-zone {
+            background: rgba(46, 125, 50, 0.3);
+            border-color: #4caf50;
+        }
+
+        .leaderboard-item.current-user {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: var(--gold-primary);
+        }
+
+        .rank-num {
+            font-weight: bold;
+            width: 30px;
+            font-size: 1.1rem;
+            color: var(--gold-primary);
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .player-score {
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .promo-info {
+            background: #2e7d32;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            font-weight: bold;
+            border: 1px solid #4caf50;
+        }
+
+        /* Generic Screens (Store/Friends) */
+        .generic-screen {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .generic-screen h2 {
+            color: var(--gold-primary);
+            margin-bottom: 10px;
+        }
+
+        /* Game Screen */
+        #game-screen {
+            background: radial-gradient(circle, #1b4d3e 0%, #0f2d23 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+            position: relative;
+        }
+
+        .game-table-felt {
+            flex: 1;
+            background: #1e6b4d;
+            border: 6px solid #8B4513;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .opponent-area, .player-game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .hand-container {
+            display: flex;
+            gap: 5px;
+            min-height: 90px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .table-cards-area {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             justify-content: center;
             align-items: center;
+            flex: 1;
+            padding: 10px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 10px;
+            border: 2px dashed rgba(255,255,255,0.2);
+            margin: 5px 0;
+            max-height: 180px;
             overflow-y: auto;
-            position: relative;
         }
 
-        .player-area {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .player-hand {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            min-height: 95px;
-        }
-
-        /* Karten Design (Neapolitanischer Stil Cartoon) */
+        /* Card Design */
         .card {
             width: 55px;
             height: 85px;
-            background: #fff;
-            border-radius: var(--card-radius);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 5px;
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.2s, top 0.2s;
-            border: 2px solid #ccc;
+            padding: 4px;
+            color: #333;
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            border: 1px solid #ccc;
         }
 
-        @media (min-width: 380px) {
-            .card { width: 62px; height: 95px; font-size: 0.9rem; }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.4);
         }
 
         .card.selected {
-            transform: translateY(-15px) scale(1.05);
-            border-color: var(--accent);
-            box-shadow: 0 8px 15px rgba(255, 165, 2, 0.5);
+            transform: translateY(-12px);
+            border: 2px solid var(--gold-primary);
+            box-shadow: 0 0 10px var(--gold-primary);
         }
 
         .card.back {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            background: linear-gradient(135deg, #b71c1c, #d32f2f);
             border: 2px solid #fff;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: rgba(255,255,255,0.4);
-            font-size: 1.5rem;
+            color: rgba(255,255,255,0.2);
         }
 
-        .card-top {
+        .card.red { color: #d32f2f; }
+        .card.blue { color: #1565c0; }
+        .card.yellow { color: #f57f17; }
+        .card.green { color: #2e7d32; }
+
+        .game-info-bar {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            font-size: 0.8rem;
+            background: rgba(0,0,0,0.4);
+            padding: 4px 8px;
+            border-radius: 5px;
         }
 
-        .card-center {
-            text-align: center;
-            font-size: 1.4rem;
+        .action-btn {
+            background: var(--gold-gradient);
+            border: 2px solid #fff;
+            color: #000;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
-        .card.denari { color: #d35400; }
-        .card.coppe { color: #c0392b; }
-        .card.spade { color: #2c3e50; }
-        .card.bastoni { color: #27ae60; }
-
-        /* Suchbildschirm / Online Bot Fallback */
-        .searching-container {
-            text-align: center;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
+        .back-btn {
+            background: #c62828;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
         }
 
-        .radar-spinner {
-            width: 100px;
-            height: 100px;
-            border: 6px solid rgba(255,255,255,0.1);
-            border-top: 6px solid var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 30px;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Modal Overlays */
+        /* Modal Overlay */
         .modal {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8);
-            display: flex;
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-
-        .modal.active {
-            opacity: 1;
-            pointer-events: auto;
         }
 
         .modal-content {
-            background: #222f3e;
+            background: #1a365d;
+            border: 4px solid var(--gold-primary);
             padding: 25px;
-            border-radius: var(--ui-radius);
-            width: 90%;
-            max-width: 400px;
-            border: 4px solid var(--accent);
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-
-        .modal-content h2 { margin-bottom: 15px; }
-        .score-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            font-size: 1.1rem;
-        }
-
-        /* Benachrichtigungs-Toast */
-        #toast {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-100px);
-            background: var(--accent);
-            color: #000;
-            padding: 10px 20px;
             border-radius: 20px;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            pointer-events: none;
-            text-transform: uppercase;
+            text-align: center;
+            width: 85%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
         }
-        #toast.show { transform: translateX(-50%) translateY(0); }
+
+        .modal-content h2 {
+            color: var(--gold-primary);
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
 
-<div id="app">
-    <!-- Toast Benachrichtigung -->
-    <div id="toast">Scopa!</div>
+<div id="app-container">
 
-    <!-- 1. HAUPTMENÜ -->
-    <div id="main-menu" class="screen">
-        <div class="logo-container">
-            <div class="cartoon-trophy">🏆</div>
-            <h1>SCOPA ARENA</h1>
-            <p style="color: #a4b0be; font-weight: 600;">Das neapolitanische Kartenspiel</p>
+    <!-- Top Bar (Visible on main screens) -->
+    <div class="top-bar" id="global-top-bar">
+        <div class="profile-container">
+            <div class="avatar-frame">
+                👤
+                <div class="level-badge">12</div>
+            </div>
+            <div>
+                <div style="font-size: 0.85rem; font-weight: bold;">MarcoP</div>
+                <div style="font-size: 0.7rem; color: #ffd700;">Gold Rang</div>
+            </div>
+        </div>
+        <div class="currencies">
+            <div class="currency-pill">
+                <div class="currency-icon coin-icon">🪙</div>
+                <span id="coin-count">12.450</span>
+            </div>
+            <div class="currency-pill">
+                <div class="currency-icon gem-icon">💎</div>
+                <span id="gem-count">145</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. DASHBOARD SCREEN -->
+    <div id="dashboard-screen" class="screen active">
+        <div class="table-area">
+            <div class="wooden-table">
+                <h1 class="game-title">SCOPA<br><span style="font-size: 1.5rem; color: #fff;">LA SFIDA</span></h1>
+                
+                <div class="mode-selector" style="margin-bottom: 15px;">
+                    <div class="mode-pill selected" onclick="setGameMode('1v1', this)">1v1 Duell</div>
+                    <div class="mode-pill" onclick="setGameMode('2v2', this)">2v2 Scopone</div>
+                </div>
+
+                <button class="play-btn" onclick="startGame()">JETZT SPIELEN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. LEAGUES SCREEN -->
+    <div id="leagues-screen" class="screen">
+        <div class="league-header">
+            <h2>🏆 Gold-Liga Rangliste</h2>
+            <p style="font-size: 0.8rem; color: #aaa;">Saison endet in: 2 Tagen</p>
+        </div>
+        
+        <div class="leaderboard" id="leaderboard-list">
+            <!-- Dynamisch gefüllt -->
         </div>
 
-        <div class="league-card">
-            <div class="league-info">
-                <p>Aktuelle Liga</p>
-                <h3 id="menu-league-name">Bronze Liga</h3>
-                <div class="progress-bar-container">
-                    <div id="menu-progress" class="progress-bar" style="width: 20%;"></div>
+        <div class="promo-info">
+            ✨ Die ersten 3 Positionen steigen in die Diamant-Liga auf!
+        </div>
+    </div>
+
+    <!-- 3. STORE SCREEN -->
+    <div id="store-screen" class="screen generic-screen">
+        <h2>🛒 Store & Angebote</h2>
+        <p style="color: #aaa; margin-bottom: 20px;">Hole dir Münzen und exklusive neapolitanische Kartendecks!</p>
+        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; border: 2px solid #b8860b;">
+            <p style="font-weight: bold; color: var(--gold-primary);">Mega Münz-Paket</p>
+            <p style="font-size: 0.9rem; margin: 10px 0;">50.000 Münzen + 50 Edelsteine</p>
+            <button class="action-btn" onclick="alert('Kauf erfolgreich simulieren!')">Für 4,99 € kaufen</button>
+        </div>
+    </div>
+
+    <!-- 4. FRIENDS SCREEN -->
+    <div id="friends-screen" class="screen generic-screen">
+        <h2>👥 Freunde & Club</h2>
+        <p style="color: #aaa; margin-bottom: 20px;">Lade Freunde ein und spiele private Matches.</p>
+        <button class="action-btn" onclick="alert('Freundeslink kopiert!')">Freund einladen</button>
+    </div>
+
+    <!-- 5. GAMEPLAY SCREEN -->
+    <div id="game-screen" class="screen">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 0;">
+            <button class="back-btn" onclick="returnToDashboard()">Aufgeben</button>
+            <div class="game-info-bar">
+                <span id="turn-indicator">Am Zug: Du</span> | Modus: <span id="current-mode-label">1v1</span>
+            </div>
+        </div>
+
+        <div class="game-table-felt">
+            <!-- Gegner Bereich -->
+            <div class="opponent-area">
+                <div style="font-size: 0.75rem;" id="opponent-name">Gegner (KI)</div>
+                <div class="hand-container" id="opponent-hand">
+                    <!-- Karten verdeckt -->
                 </div>
             </div>
-            <div style="font-size: 2.5rem;" id="menu-league-icon">🥉</div>
-        </div>
 
-        <div style="display: flex; flex-direction: column; gap: 5px;">
-            <button class="btn btn-green" onclick="showScreen('mode-screen')">🃏 Spielen</button>
-            <button class="btn btn-blue" onclick="showScreen('league-screen')">🏅 Ligen & Ränge</button>
-            <button class="btn btn-purple" onclick="showRules()">📖 Regeln</button>
-        </div>
-    </div>
+            <!-- Tisch Mitte -->
+            <div class="table-cards-area" id="table-cards">
+                <!-- Auf dem Tisch liegende Karten -->
+            </div>
 
-    <!-- 2. SPIELMODI AUSWAHL -->
-    <div id="mode-screen" class="screen hidden">
-        <div>
-            <h2 style="margin-top: 15px; margin-bottom: 25px;">Wähle den Modus</h2>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <button class="btn" onclick="startMatch('ai_1v1')">🤖 1 vs 1 gegen KI</button>
-                <button class="btn btn-blue" onclick="startMatch('online_1v1')">🌐 Online Suche (Bot-Fallback)</button>
-                <button class="btn btn-green" onclick="startMatch('scopone_2v2')">👥 Scopone (2 vs 2 Team)</button>
+            <!-- Eigener Bereich -->
+            <div class="player-game-area">
+                <div class="hand-container" id="player-hand">
+                    <!-- Spieler Handkarten -->
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <div style="font-size: 0.75rem;">Deine Punkte: <span id="player-game-score">0</span></div>
+                    <button class="action-btn" id="play-move-btn" onclick="executePlayerMove()">Karte spielen</button>
+                </div>
             </div>
         </div>
-        <button class="btn" style="background-color: #718093; box-shadow: 0 6px 0 #4a5568;" onclick="showScreen('main-menu')">⬅ Zurück</button>
     </div>
 
-    <!-- 3. ONLINE SUCHE / BOT FALLBACK BILDSCHIRM -->
-    <div id="search-screen" class="screen hidden" style="justify-content: center; align-items: center;">
-        <div class="searching-container">
-            <div class="radar-spinner"></div>
-            <h2>Suche Mitspieler...</h2>
-            <p id="search-timer-text" style="color: #a4b0be; margin-top: 10px;">Verbleibend: 30s</p>
-        </div>
-        <button class="btn btn-primary" style="width: 100%; margin-bottom: 20px;" onclick="cancelSearch()">Abbrechen</button>
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav" id="global-bottom-nav">
+        <button class="nav-item active" onclick="switchScreen('dashboard-screen', this)">
+            <span class="nav-icon">🏠</span>
+            <span>Menü</span>
+        </button>
+        <button class="nav-item" onclick="switchScreen('leagues-screen', this)">
+            <span class="nav-icon">🏆</span>
+            <span>Ligen</span>
+        </button>
+        <button class="nav-item" onclick="switchScreen('store-screen', this)">
+            <span class="nav-icon">🛒</span>
+            <span>Store</span>
+        </button>
+        <button class="nav-item" onclick="switchScreen('friends-screen', this)">
+            <span class="nav-icon">👥</span>
+            <span>Freunde</span>
+        </button>
     </div>
 
-    <!-- 4. LIGA & RANG SYSTEM -->
-    <div id="league-screen" class="screen hidden">
-        <div>
-            <h2 style="margin-top: 10px; margin-bottom: 15px;">Liga-Übersicht</h2>
-            <div id="league-list" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto; max-height: 480px; padding-right: 5px;">
-                <!-- Wird dynamisch gefüllt -->
-            </div>
-        </div>
-        <button class="btn" style="background-color: #718093; box-shadow: 0 6px 0 #4a5568;" onclick="showScreen('main-menu')">⬅ Zurück</button>
-    </div>
-
-    <!-- 5. SPIELBILDSCHIRM (TABLE) -->
-    <div id="game-screen" class="screen hidden">
-        <!-- Oben: Gegner oder Team-Gegner -->
-        <div class="table-header">
-            <span id="opp-name">Gegner (KI)</span>
-            <span id="opp-score">Punkte: 0</span>
-        </div>
-        <div class="opponent-area" id="opponent-hand-area">
-            <!-- Gegner Handkarten (Rückseite) -->
-        </div>
-
-        <!-- Mitte: Der Kartentisch -->
-        <div class="center-table" id="center-table-area">
-            <!-- Tischkarten -->
-        </div>
-
-        <!-- Unten: Spieler Bereich -->
-        <div class="player-area">
-            <div style="display: flex; justify-content: space-between; width: 100%; padding: 0 5px; font-size: 0.9rem;">
-                <span id="player-name">Du</span>
-                <span id="player-score">Punkte: 0</span>
-            </div>
-            <div class="player-hand" id="player-hand-area">
-                <!-- Eigene Handkarten -->
-            </div>
-            <button class="btn btn-green" id="action-btn" onclick="executePlayerMove()" style="padding: 10px; margin-top: 5px; font-size: 1rem;" disabled>Karte spielen</button>
-        </div>
-    </div>
-
-    <!-- SPIELENDE / RUNDENENDE MODAL -->
-    <div id="result-modal" class="modal">
+    <!-- End Game Modal -->
+    <div class="modal" id="game-over-modal">
         <div class="modal-content">
-            <h2 id="modal-title">Runden-Ergebnis</h2>
-            <div id="modal-body" style="margin: 15px 0;">
-                <!-- Detaillierte Wertung -->
-            </div>
-            <button class="btn btn-green" onclick="closeResultModal()">Weiterspielen</button>
+            <h2 id="modal-title">Spiel beendet!</h2>
+            <p id="modal-text" style="margin-bottom: 20px;">Du hast gewonnen und 500 Münzen erhalten!</p>
+            <button class="play-btn" style="font-size: 1.2rem; padding: 10px 20px;" onclick="returnToDashboard()">Zurück zum Menü</button>
         </div>
     </div>
 
 </div>
 
 <script>
-    /* --- SPIEL-KONFIGURATION & DATEN --- */
-    const suits = ['denari', 'coppe', 'spade', 'bastoni'];
-    const suitSymbols = { denari: '🪙', coppe: '🏆', spade: '🗡️', bastoni: '🪵' };
-    
-    // Ränge & Ligen
-    const leagues = [
-        { name: 'Bronze Liga', icon: '🥉', minWins: 0 },
-        { name: 'Silber Liga', icon: '🥈', minWins: 3 },
-        { name: 'Gold Liga', icon: '🥇', minWins: 7 },
-        { name: 'Platin Liga', icon: '💎', minWins: 12 },
-        { name: 'Grandmaster Arena', icon: '👑', minWins: 20 }
-    ];
+    // --- Spielzustand & Daten ---
+    let currentGameMode = '1v1';
+    let selectedHandCard = null;
+    let selectedTableCards = [];
+    let playerCoins = 12450;
 
-    let gameState = {
-        mode: 'ai_1v1', // 'ai_1v1', 'online_1v1', 'scopone_2v2'
-        playerWins: 0,
-        deck: [],
-        playerHand: [],
-        opponentHand: [],
-        partnerHand: [], // Für 2vs2
-        leftOpponentHand: [], // Für 2vs2
-        rightOpponentHand: [], // Für 2vs2
-        tableCards: [],
-        playerCaptured: [],
-        opponentCaptured: [],
-        teamACaptured: [], // Spieler + Partner bei Scopone
-        teamBCaptured: [], // Gegner 1 + Gegner 2 bei Scopone
-        turn: 0, // 0: Spieler, 1: Gegner/Nächster
-        selectedCardIndex: null,
-        matchScore: { team1: 0, team2: 0 },
-        searchTimer: null,
-        searchSecondsLeft: 30
-    };
+    const suits = ['Denari', 'Coppe', 'Spade', 'Bastoni'];
+    const suitIcons = { 'Denari': '🪙', 'Coppe': '🏆', 'Spade': '⚔️', 'Bastoni': '🪵' };
+    const suitColors = { 'Denari': 'yellow', 'Coppe': 'red', 'Spade': 'blue', 'Bastoni': 'green' };
 
-    // Beim Start laden
-    window.onload = () => {
-        loadProgress();
-        updateLeagueUI();
-    };
+    let deck = [];
+    let playerHand = [];
+    let opponentHand = [];
+    let tableCards = [];
+    let playerCaptured = [];
+    let opponentCaptured = [];
 
-    function loadProgress() {
-        const savedWins = localStorage.getItem('scopa_player_wins');
-        if (savedWins !== null) {
-            gameState.playerWins = parseInt(savedWins);
+    // --- Navigation ---
+    function switchScreen(screenId, element) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        if(element) element.classList.add('active');
+
+        const topBar = document.getElementById('global-top-bar');
+        const bottomNav = document.getElementById('global-bottom-nav');
+
+        if(screenId === 'game-screen') {
+            topBar.style.display = 'none';
+            bottomNav.style.display = 'none';
+        } else {
+            topBar.style.display = 'flex';
+            bottomNav.style.display = 'flex';
+            if(screenId === 'leagues-screen') loadLeaderboard();
         }
     }
 
-    function saveProgress() {
-        localStorage.setItem('scopa_player_wins', gameState.playerWins);
+    function setGameMode(mode, element) {
+        currentGameMode = mode;
+        document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove('selected'));
+        element.classList.add('selected');
     }
 
-    function showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-        document.getElementById(screenId).classList.remove('hidden');
-        if(screenId === 'league-screen') {
-            renderLeagueScreen();
-        }
+    function returnToDashboard() {
+        document.getElementById('game-over-modal').style.display = 'none';
+        switchScreen('dashboard-screen', document.querySelector('.nav-item'));
     }
 
-    function showToast(msg) {
-        const toast = document.getElementById('toast');
-        toast.innerText = msg;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2500);
-    }
-
-    /* --- LIGA UI & BERECHNUNG --- */
-    function getCurrentLeague() {
-        let current = leagues[0];
-        for (let l of leagues) {
-            if (gameState.playerWins >= l.minWins) current = l;
-        }
-        return current;
-    }
-
-    function updateLeagueUI() {
-        const cur = getCurrentLeague();
-        document.getElementById('menu-league-name').innerText = cur.name;
-        document.getElementById('menu-league-icon').innerText = cur.icon;
-        
-        // Finde nächste Liga für Prozentbalken
-        let curIdx = leagues.findIndex(l => l.name === cur.name);
-        let nextLeague = leagues[curIdx + 1];
-        let progressPercent = 100;
-        if(nextLeague) {
-            let prevWins = cur.minWins;
-            let needed = nextLeague.minWins - prevWins;
-            let currentInTier = gameState.playerWins - prevWins;
-            progressPercent = Math.min(100, Math.max(0, (currentInTier / needed) * 100));
-        }
-        document.getElementById('menu-progress').style.width = progressPercent + '%';
-    }
-
-    function renderLeagueScreen() {
-        const list = document.getElementById('league-list');
+    // --- Rangliste (Ligen) ---
+    function loadLeaderboard() {
+        const list = document.getElementById('leaderboard-list');
         list.innerHTML = '';
-        let curLeague = getCurrentLeague();
+        const players = [
+            { rank: 1, name: "Luigi_Pro", score: "3.420 Pkt", promo: true },
+            { rank: 2, name: "Sofia_Napoli", score: "3.100 Pkt", promo: true },
+            { rank: 3, name: "MarcoP (Du)", score: "2.950 Pkt", promo: true, user: true },
+            { rank: 4, name: "Giovanni99", score: "2.800 Pkt", promo: false },
+            { rank: 5, name: "Alessia_Cards", score: "2.650 Pkt", promo: false },
+            { rank: 6, name: "Don_Vito", score: "2.400 Pkt", promo: false }
+        ];
 
-        leagues.forEach((l, index) => {
-            let isCurrent = l.name === curLeague.name;
-            let div = document.createElement('div');
-            div.className = 'league-card';
-            if(isCurrent) div.style.borderColor = 'var(--accent)';
-            
-            div.innerHTML = `
-                <div style="font-size: 2.2rem; margin-right: 15px;">${l.icon}</div>
-                <div class="league-info" style="flex-grow: 1;">
-                    <h3>${l.name} ${isCurrent ? '(Deine Liga)' : ''}</h3>
-                    <p>Ab ${l.minWins} Siege erforderlich</p>
+        players.forEach(p => {
+            const item = document.createElement('div');
+            item.className = `leaderboard-item ${p.promo ? 'promotion-zone' : ''} ${p.user ? 'current-user' : ''}`;
+            item.innerHTML = `
+                <div class="rank-num">#${p.rank}</div>
+                <div class="player-info">
+                    <span>👤</span>
+                    <span>${p.name}</span>
                 </div>
+                <div class="player-score">${p.score}</div>
             `;
-            list.appendChild(div);
+            list.appendChild(item);
         });
     }
 
-    /* --- SPIELMODI & ONLINE SUCHE --- */
-    function startMatch(mode) {
-        gameState.mode = mode;
-        if (mode === 'online_1v1') {
-            // Starte Suchbildschirm mit 30 Sek Countdown
-            showScreen('search-screen');
-            gameState.searchSecondsLeft = 30;
-            document.getElementById('search-timer-text').innerText = `Verbleibend: ${gameState.searchSecondsLeft}s`;
-            
-            clearInterval(gameState.searchTimer);
-            gameState.searchTimer = setInterval(() => {
-                gameState.searchSecondsLeft--;
-                document.getElementById('search-timer-text').innerText = `Verbleibend: ${gameState.searchSecondsLeft}s`;
-                if(gameState.searchSecondsLeft <= 0) {
-                    clearInterval(gameState.searchTimer);
-                    showToast('Kein Gegner gefunden - Bot springt ein!');
-                    initGameEngine();
-                }
-            }, 1000);
-        } else {
-            initGameEngine();
-        }
+    // --- Scopa Spiellogik ---
+    function startGame() {
+        switchScreen('game-screen', null);
+        document.getElementById('current-mode-label').innerText = currentGameMode;
+        initNewGameRound();
     }
 
-    function cancelSearch() {
-        clearInterval(gameState.searchTimer);
-        showScreen('mode-screen');
-    }
-
-    /* --- KARTEN & SPIELLOGIK (SCOPA ENGINE) --- */
     function createDeck() {
-        let deck = [];
+        let d = [];
         suits.forEach(suit => {
-            for (let val = 1; val <= 10; val++) {
-                deck.push({ suit: suit, value: val, id: `${suit}_${val}` });
+            for(let i = 1; i <= 10; i++) {
+                d.push({ suit: suit, value: i, name: getCardName(i) });
             }
         });
-        // Mischen (Fisher-Yates)
-        for (let i = deck.length - 1; i > 0; i--) {
-            let j = Math.floor(Math.random() * (i + 1));
-            [deck[i], deck[j]] = [deck[j], deck[i]];
-        }
-        return deck;
+        // Mischen
+        return d.sort(() => Math.random() - 0.5);
     }
 
-    function initGameEngine() {
-        showScreen('game-screen');
-        gameState.deck = createDeck();
-        gameState.tableCards = [];
-        gameState.playerCaptured = [];
-        gameState.opponentCaptured = [];
-        gameState.teamACaptured = [];
-        gameState.teamBCaptured = [];
-        gameState.matchScore = { team1: 0, team2: 0 };
-
-        // Namen anpassen
-        if (gameState.mode === 'scopone_2v2') {
-            document.getElementById('opp-name').innerText = 'Team Gegner (Giuseppe & Luigi)';
-            document.getElementById('player-name').innerText = 'Du & Partner (Marco)';
-        } else {
-            document.getElementById('opp-name').innerText = 'Luigi (KI)';
-            document.getElementById('player-name').innerText = 'Du';
-        }
-
-        startNewDeal();
+    function getCardName(val) {
+        if(val === 1) return 'Ace';
+        if(val === 8) return 'Fante';
+        if(val === 9) return 'Cavallo';
+        if(val === 10) return 'Re';
+        return val.toString();
     }
 
-    function startNewDeal() {
-        if (gameState.deck.length === 0) {
-            // Spielende / Rundenende Auswertung
-            evaluateRound();
-            return;
-        }
+    function initNewGameRound() {
+        deck = createDeck();
+        playerHand = deck.splice(0, 3);
+        opponentHand = deck.splice(0, 3);
+        tableCards = deck.splice(0, 4);
+        playerCaptured = [];
+        opponentCaptured = [];
+        selectedHandCard = null;
+        selectedTableCards = [];
 
-        // Austragen abhängig vom Modus
-        if (gameState.mode === 'scopone_2v2') {
-            // Scopone: Allen 4 Spielern werden alle 40 Karten komplett ausgeteilt (10 Karten pro Hand)
-            gameState.playerHand = gameState.deck.splice(0, 10);
-            gameState.partnerHand = gameState.deck.splice(0, 10);
-            gameState.leftOpponentHand = gameState.deck.splice(0, 10);
-            gameState.opponentHand = gameState.deck.splice(0, 10); // 4. Spieler
-            gameState.tableCards = []; // Keine Tischkarten zu Beginn bei Scopone!
-        } else {
-            // Normales Scopa (1vs1): 3 Karten für jeden, 4 Karten auf den Tisch
-            gameState.playerHand = gameState.deck.splice(0, 3);
-            gameState.opponentHand = gameState.deck.splice(0, 3);
-            if (gameState.tableCards.length === 0) {
-                gameState.tableCards = gameState.deck.splice(0, 4);
-            }
-        }
-
-        gameState.selectedCardIndex = null;
-        updateGameUI();
+        renderGameTable();
     }
 
-    /* --- UI RENDERING FÜR DEN TISCH --- */
-    function renderCardHTML(card, isBack = false, onClickStr = '') {
-        if (isBack) {
-            return `<div class="card back">🎴</div>`;
-        }
-        let valName = card.value;
-        if (card.value === 1) valName = 'A';
-        if (card.value === 8) valName = 'F'; // Fante
-        if (card.value === 9) valName = 'C'; // Cavallo
-        if (card.value === 10) valName = 'R'; // Re
-
-        return `
-            <div class="card ${card.suit} ${onClickStr ? '' : ''}" onclick="${onClickStr}">
-                <div class="card-top">
-                    <span>${valName}</span>
-                    <span>${suitSymbols[card.suit]}</span>
-                </div>
-                <div class="card-center">${suitSymbols[card.suit]}</div>
-                <div class="card-top" style="transform: rotate(180deg);">
-                    <span>${valName}</span>
-                    <span>${suitSymbols[card.suit]}</span>
-                </div>
-            </div>
-        `;
-    }
-
-    function updateGameUI() {
-        // Tischkarten rendern
-        const centerArea = document.getElementById('center-table-area');
-        centerArea.innerHTML = '';
-        gameState.tableCards.forEach((card, idx) => {
-            let cardHtml = renderCardHTML(card, false, `selectCardOnTable(${idx})`);
-            centerArea.innerHTML += cardHtml;
+    function renderGameTable() {
+        // Gegner Karten (verdeckt)
+        const oppHandEl = document.getElementById('opponent-hand');
+        oppHandEl.innerHTML = '';
+        opponentHand.forEach(() => {
+            const card = document.createElement('div');
+            card.className = 'card back';
+            card.innerHTML = '♠';
+            oppHandEl.appendChild(card);
         });
 
-        // Spieler Handkarten
-        const playerHandArea = document.getElementById('player-hand-area');
-        playerHandArea.innerHTML = '';
-        gameState.playerHand.forEach((card, idx) => {
-            let isSelected = gameState.selectedCardIndex === idx;
-            let el = document.createElement('div');
-            el.innerHTML = renderCardHTML(card, false);
-            let cardDiv = el.firstElementChild;
-            if(isSelected) cardDiv.classList.add('selected');
-            cardDiv.onclick = () => selectPlayerCard(idx);
-            playerHandArea.appendChild(el);
+        // Tisch Karten
+        const tableEl = document.getElementById('table-cards');
+        tableEl.innerHTML = '';
+        tableCards.forEach((c, index) => {
+            const card = document.createElement('div');
+            const colorClass = suitColors[c.suit];
+            card.className = `card ${colorClass} ${selectedTableCards.includes(index) ? 'selected' : ''}`;
+            card.innerHTML = `
+                <div>${c.name}<br>${suitIcons[c.suit]}</div>
+                <div style="font-size: 1.2rem; text-align: center;">${suitIcons[c.suit]}</div>
+                <div style="transform: rotate(180deg);">${c.name}<br>${suitIcons[c.suit]}</div>
+            `;
+            card.onclick = () => toggleTableCardSelection(index);
+            tableEl.appendChild(card);
         });
 
-        // Gegner Handkarten (Rückseite)
-        const oppArea = document.getElementById('opponent-hand-area');
-        oppArea.innerHTML = '';
-        let oppHandCount = gameState.opponentHand.length;
-        for(let i=0; i<oppHandCount; i++) {
-            oppArea.innerHTML += renderCardHTML(null, true);
-        }
+        // Spieler Hand
+        const playerHandEl = document.getElementById('player-hand');
+        playerHandEl.innerHTML = '';
+        playerHand.forEach((c, index) => {
+            const card = document.createElement('div');
+            const colorClass = suitColors[c.suit];
+            card.className = `card ${colorClass} ${selectedHandCard === index ? 'selected' : ''}`;
+            card.innerHTML = `
+                <div>${c.name}<br>${suitIcons[c.suit]}</div>
+                <div style="font-size: 1.2rem; text-align: center;">${suitIcons[c.suit]}</div>
+                <div style="transform: rotate(180deg);">${c.name}<br>${suitIcons[c.suit]}</div>
+            `;
+            card.onclick = () => selectPlayerHandCard(index);
+            playerHandEl.appendChild(card);
+        });
 
-        // Punktestand anzeigen
-        document.getElementById('player-score').innerText = `Punkte: ${gameState.matchScore.team1}`;
-        document.getElementById('opp-score').innerText = `Punkte: ${gameState.matchScore.team2}`;
-
-        // Action Button aktivieren falls Karte gewählt
-        document.getElementById('action-btn').disabled = gameState.selectedCardIndex === null || gameState.turn !== 0;
+        document.getElementById('player-game-score').innerText = playerCaptured.length;
     }
 
-    /* --- SPIELER INTERAKTIONEN --- */
-    function selectPlayerCard(idx) {
-        if(gameState.turn !== 0) return; // Nicht am Zug
-        if(gameState.selectedCardIndex === idx) {
-            gameState.selectedCardIndex = null; // Abwählen
-        } else {
-            gameState.selectedCardIndex = idx;
-        }
-        updateGameUI();
+    function selectPlayerHandCard(index) {
+        selectedHandCard = index;
+        selectedTableCards = []; // Reset Tisch-Auswahl bei Handkarten-Wechsel
+        renderGameTable();
     }
 
-    let selectedTableCardIndices = []; // Falls mehrere Kombinationen möglich sind
-    function selectCardOnTable(idx) {
-        // Hier können Spieler gezielt Karten zum Nehmen anklicken
-        let cardEl = event.currentTarget;
-        cardEl.classList.toggle('selected');
-        const pos = selectedTableCardIndices.indexOf(idx);
+    function toggleTableCardSelection(index) {
+        const pos = selectedTableCards.indexOf(index);
         if(pos > -1) {
-            selectedTableCardIndices.splice(pos, 1);
+            selectedTableCards.splice(pos, 1);
         } else {
-            selectedTableCardIndices.push(idx);
+            selectedTableCards.push(index);
         }
+        renderGameTable();
     }
 
     function executePlayerMove() {
-        if(gameState.selectedCardIndex === null) return;
-        let card = gameState.playerHand[gameState.selectedCardIndex];
+        if(selectedHandCard === null) {
+            alert('Wähle zuerst eine Karte von deiner Hand aus!');
+            return;
+        }
 
-        // Prüfen, ob gültiger Zug vorliegt
-        // Regelprüfung: Passt die gespielte Karte zu einer einzelnen Tischkarte oder einer Summe?
-        let success = processMove(card, gameState.playerHand, gameState.playerCaptured, true);
-        if(!success) return;
+        const playedCard = playerHand[selectedHandCard];
 
-        gameState.selectedCardIndex = null;
-        selectedTableCardIndices = [];
-        updateGameUI();
-
-        // Prüfen ob Runde beendet (Hände leer)
-        checkRoundEndOrNextTurn();
-    }
-
-    /* --- DIE KERN-REGELN FÜR DIE KARTEN-ABHÖRE / CAPTURE --- */
-    function processMove(card, handArray, captureArray, isPlayer = false) {
-        // Handkarte entfernen
-        let handIdx = handArray.indexOf(card);
-        if(handIdx > -1) handArray.splice(handIdx, 1);
-
-        // Prüfe ob exakter Einzelwert auf dem Tisch liegt
-        let exactMatchIndex = gameState.tableCards.findIndex(c => c.value === card.value);
-        
-        // Wenn man gezielt anclickt, prüfen wir die Auswahl des Spielers
-        let capturedCards = [];
-        if(isPlayer && selectedTableCardIndices.length > 0) {
-            let sum = selectedTableCardIndices.reduce((acc, i) => acc + gameState.tableCards[i].value, 0);
-            if(sum === card.value) {
-                // Gültige Kombination über Klicks gewählt
-                // Sortiere absteigend zum sicheren Löschen
-                selectedTableCardIndices.sort((a,b) => b - a);
-                selectedTableCardIndices.forEach(i => {
-                    capturedCards.push(gameState.tableCards.splice(i, 1)[0]);
+        // Prüfe ob gültiger Zug (Entweder exakter Wert oder Summe)
+        if(selectedTableCards.length > 0) {
+            const sum = selectedTableCards.reduce((acc, idx) => acc + tableCards[idx].value, 0);
+            if(sum === playedCard.value) {
+                // Gültiger Zug: Nimm Karten vom Tisch
+                playerCaptured.push(playedCard);
+                selectedTableCards.sort((a,b) => b - a).forEach(idx => {
+                    playerCaptured.push(tableCards.splice(idx, 1)[0]);
                 });
+                playerHand.splice(selectedHandCard, 1);
+                
+                // Zug beendet -> Gegner ist dran
+                aiTurn();
             } else {
-                showToast('Summe stimmt nicht überein!');
-                handArray.push(card); // Zurück auf Hand
-                return false;
+                alert('Die Summe der Tischkarten stimmt nicht mit dem Kartenwert überein!');
             }
-        } else if(exactMatchIndex > -1 && (!isPlayer || selectedTableCardIndices.length === 0)) {
-            // Automatisch die Einzelkarte nehmen
-            capturedCards.push(gameState.tableCards.splice(exactMatchIndex, 1)[0]);
         } else {
-            // Prüfen ob Summe möglich ist
-            let matchIndices = findSumCombination(gameState.tableCards, card.value);
-            if(matchIndices.length > 0) {
-                // Nimm die Summe
-                matchIndices.sort((a,b) => b - a);
-                matchIndices.forEach(i => {
-                    capturedCards.push(gameState.tableCards.splice(i, 1)[0]);
-                });
+            // Keine Tischkarte ausgewählt -> Karte einfach ablegen
+            if(tableCards.some(c => c.value === playedCard.value)) {
+                alert('Du musst eine Karte nehmen, wenn eine Karte gleichen Werts auf dem Tisch liegt!');
+                return;
+            }
+            tableCards.push(playedCard);
+            playerHand.splice(selectedHandCard, 1);
+            aiTurn();
+        }
+
+        selectedHandCard = null;
+        selectedTableCards = [];
+        renderGameTable();
+
+        // Prüfe Rundenende
+        if(playerHand.length === 0 && opponentHand.length === 0) {
+            if(deck.length > 0) {
+                playerHand = deck.splice(0, 3);
+                opponentHand = deck.splice(0, 3);
+                renderGameTable();
             } else {
-                // Keine Karten genommen -> Karte bleibt auf dem Tisch liegen!
-                gameState.tableCards.push(card);
-                if(isPlayer) showToast('Karte auf den Tisch gelegt');
-                finishTurnAfterMove();
-                return true;
+                endGame();
             }
         }
-
-        // Karten dem Gewinner hinzufügen + Scopa Prüfung!
-        capturedCards.push(card);
-        captureArray.push(...capturedCards);
-
-        // SCOPA PRÜFUNG: Wenn der Tisch komplett leergeräumt wurde und das Deck nicht leer ist (oder je nach Modus)
-        if(gameState.tableCards.length === 0 && gameState.deck.length > 0) {
-            showToast('✨ SCOPA! (+1 Punkt)');
-            // Scopa zählen
-            if(isPlayer) gameState.matchScore.team1 += 1;
-            else gameState.matchScore.team2 += 1;
-        } else {
-            if(isPlayer) showToast('Karte(n) eingezogen!');
-        }
-
-        finishTurnAfterMove();
-        return true;
     }
 
-    function findSumCombination(table, targetVal) {
-        // Einfacher Subset-Sum Algorithmus für kleine Arrays
-        let n = table.length;
-        for(let i=0; i<(1<<n); i++) {
-            let sum = 0;
-            let indices = [];
-            for(let j=0; j<n; j++) {
-                if((i & (1 << j)) !== 0) {
-                    sum += table[j].value;
-                    indices.push(j);
-                }
-            }
-            if(sum === targetVal) return indices;
-        }
-        return [];
-    }
-
-    function finishTurnAfterMove() {
-        selectedTableCardIndices = [];
-        if(gameState.mode === 'scopone_2v2') {
-            // Scopone 4 Spieler Zyklus: Du -> Partner -> Gegner1 -> Gegner2
-            // Für den Prototyp simulieren wir die Mitspieler intelligent
-            setTimeout(runAITurnsForScopone, 600);
-        } else {
-            // 1 vs 1 KI Zug
-            gameState.turn = 1;
-            updateGameUI();
-            setTimeout(runAITurn1v1, 800);
-        }
-    }
-
-    /* --- KI LOGIK --- */
-    function runAITurn1v1() {
-        if(gameState.opponentHand.length === 0) return;
-        
-        // KI wählt intelligente Karte
-        let cardToPlay = chooseAICard(gameState.opponentHand, gameState.tableCards);
-        processMove(cardToPlay, gameState.opponentHand, gameState.opponentCaptured, false);
-        
-        gameState.turn = 0;
-        updateGameUI();
-        checkRoundEndOrNextTurn();
-    }
-
-    function chooseAICard(hand, table) {
-        // 1. Suche ob KI eine Scopa verhindern oder selbst machen kann
-        for(let card of hand) {
-            let exact = table.find(c => c.value === card.value);
-            if(exact) return card;
-        }
-        // 2. Suche passende Summe
-        for(let card of hand) {
-            let combo = findSumCombination(table, card.value);
-            if(combo.length > 0) return card;
-        }
-        // 3. Ansonsten spiele eine beliebige Karte (am besten hohe Karten behalten, niedrige legen)
-        return hand[0];
-    }
-
-    function runAITurnsForScopone() {
-        // Simuliert Partner und Gegner im 2vs2
-        if(gameState.partnerHand.length > 0) {
-            let pCard = gameState.partnerHand[0];
-            processMove(pCard, gameState.partnerHand, gameState.teamACaptured, false);
-        }
-        if(gameState.leftOpponentHand.length > 0) {
-            let o1Card = gameState.leftOpponentHand[0];
-            processMove(o1Card, gameState.leftOpponentHand, gameState.teamBCaptured, false);
-        }
-        if(gameState.opponentHand.length > 0) {
-            let o2Card = gameState.opponentHand[0];
-            processMove(o2Card, gameState.opponentHand, gameState.teamBCaptured, false);
-        }
-        updateGameUI();
-        checkRoundEndOrNextTurn();
-    }
-
-    function checkRoundEndOrNextTurn() {
-        if(gameState.playerHand.length === 0) {
-            if(gameState.deck.length > 0) {
-                // Nächste 3 Karten austeilen
-                if(gameState.mode === 'scopone_2v2') {
-                    // Scopone teilt nur einmal komplett aus, daher ist hier die Runde vorbei
-                    evaluateRound();
+    function aiTurn() {
+        document.getElementById('turn-indicator').innerText = 'Am Zug: Gegner denkt...';
+        setTimeout(() => {
+            if(opponentHand.length > 0) {
+                const aiCard = opponentHand.pop();
+                // Einfache KI: Legt ab oder nimmt erste passende Karte
+                let matchIndex = tableCards.findIndex(c => c.value === aiCard.value);
+                if(matchIndex > -1) {
+                    opponentCaptured.push(aiCard, tableCards.splice(matchIndex, 1)[0]);
                 } else {
-                    gameState.playerHand = gameState.deck.splice(0, 3);
-                    gameState.opponentHand = gameState.deck.splice(0, 3);
-                    updateGameUI();
+                    tableCards.push(aiCard);
                 }
-            } else {
-                evaluateRound();
             }
-        }
+            document.getElementById('turn-indicator').innerText = 'Am Zug: Du';
+            renderGameTable();
+        }, 1000);
     }
 
-    /* --- SCHLUSSWERTUNG DER RUNDE (SCOPA REGELN) --- */
-    function evaluateRound() {
-        // Letzte verbliebene Tischkarten gehen an den letzten Spieler der sie genommen hat (vereinfacht Team 1)
-        if(gameState.tableCards.length > 0) {
-            gameState.playerCaptured.push(...gameState.tableCards);
-            gameState.tableCards = [];
-        }
-
-        let p1Cards = gameState.playerCaptured;
-        let p2Cards = gameState.opponentCaptured;
-        if(gameState.mode === 'scopone_2v2') {
-            p1Cards = gameState.teamACaptured;
-            p2Cards = gameState.teamBCaptured;
-        }
-
-        let scoreTeam1Round = 0;
-        let scoreTeam2Round = 0;
-        let detailsText = '';
-
-        // 1. CARTE (Meiste Karten: > 20 bei 40 Karten)
-        if(p1Cards.length > p2Cards.length) {
-            scoreTeam1Round += 1;
-            detailsText += `<div class="score-row"><span>Meiste Karten (${p1Cards.length}):</span> <span style="color:var(--secondary)">+1 Pkt (Du)</span></div>`;
-        } else if(p2Cards.length > p1Cards.length) {
-            scoreTeam2Round += 1;
-            detailsText += `<div class="score-row"><span>Meiste Karten (${p2Cards.length}):</span> <span style="color:var(--primary)">+1 Pkt (Gegner)</span></div>`;
+    function endGame() {
+        const modal = document.getElementById('game-over-modal');
+        const text = document.getElementById('modal-text');
+        if(playerCaptured.length >= opponentCaptured.length) {
+            playerCoins += 300;
+            document.getElementById('coin-count').innerText = playerCoins.toLocaleString();
+            text.innerText = 'Herzlichen Glückwunsch! Du hast das Match gewonnen und +300 Münzen erhalten.';
         } else {
-            detailsText += `<div class="score-row"><span>Meiste Karten:</span> <span>Unentschieden</span></div>`;
+            text.innerText = 'Schade! Der Gegner hat dieses Match gewonnen. Probiere es noch einmal!';
         }
-
-        // 2. DENARI (Meiste Münzen / Karo)
-        let p1Denari = p1Cards.filter(c => c.suit === 'denari').length;
-        let p2Denari = p2Cards.filter(c => c.suit === 'denari').length;
-        if(p1Denari > p2Denari) {
-            scoreTeam1Round += 1;
-            detailsText += `<div class="score-row"><span>Meiste Denari (${p1Denari}):</span> <span style="color:var(--secondary)">+1 Pkt (Du)</span></div>`;
-        } else if(p2Denari > p1Denari) {
-            scoreTeam2Round += 1;
-            detailsText += `<div class="score-row"><span>Meiste Denari (${p2Denari}):</span> <span style="color:var(--primary)">+1 Pkt (Gegner)</span></div>`;
-        }
-
-        // 3. SETTEBELLO (7 von Denari)
-        let hasSettebelloP1 = p1Cards.some(c => c.suit === 'denari' && c.value === 7);
-        if(hasSettebelloP1) {
-            scoreTeam1Round += 1;
-            detailsText += `<div class="score-row"><span>Settebello (7🪙):</span> <span style="color:var(--secondary)">+1 Pkt (Du)</span></div>`;
-        } else {
-            scoreTeam2Round += 1;
-            detailsText += `<div class="score-row"><span>Settebello (7🪙):</span> <span style="color:var(--primary)">+1 Pkt (Gegner)</span></div>`;
-        }
-
-        // 4. PRIMIERA (Bestes Karten-Set aus den 4 Farben)
-        let primieraP1 = calcPrimiera(p1Cards);
-        let primieraP2 = calcPrimiera(p2Cards);
-        detailsText += `<div class="score-row"><span>Primiera (Wert):</span> <span>${primieraP1} vs ${primieraP2}</span></div>`;
-        if(primieraP1 > primieraP2) {
-            scoreTeam1Round += 1;
-            detailsText += `<div class="score-row"><span>Primiera Punkt:</span> <span style="color:var(--secondary)">+1 Pkt (Du)</span></div>`;
-        } else if(primieraP2 > primieraP1) {
-            scoreTeam2Round += 1;
-            detailsText += `<div class="score-row"><span>Primiera Punkt:</span> <span style="color:var(--primary)">+1 Pkt (Gegner)</span></div>`;
-        }
-
-        // Gesamtsumme addieren
-        gameState.matchScore.team1 += scoreTeam1Round;
-        gameState.matchScore.team2 += scoreTeam2Round;
-
-        // Modal anzeigen
-        document.getElementById('modal-title').innerText = scoreTeam1Round >= scoreTeam2Round ? 'Runde Gewonnen! 🎉' : 'Runde Verloren! 😢';
-        document.getElementById('modal-body').innerHTML = `
-            ${detailsText}
-            <hr style="border-color:rgba(255,255,255,0.2); margin: 10px 0;">
-            <div style="font-weight:bold; font-size:1.2rem;">Gesamtstand: ${gameState.matchScore.team1} : ${gameState.matchScore.team2}</div>
-        `;
-        document.getElementById('result-modal').classList.add('active');
-
-        // Wenn Du gewinnst, zähle für die Liga hoch
-        if(scoreTeam1Round >= scoreTeam2Round) {
-            gameState.playerWins++;
-            saveProgress();
-            updateLeagueUI();
-        }
-    }
-
-    function calcPrimiera(cards) {
-        // Primiera Werte gemäß offiziellem Scopa-Standard:
-        // 7 = 21, 6 = 18, Asso = 16, 5 = 15, 4 = 14, 3 = 13, 2 = 12, Re/Cavallo/Fante = 10
-        const primieraValues = { 7: 21, 6: 18, 1: 16, 5: 15, 4: 14, 3: 13, 2: 12, 10: 10, 9: 10, 8: 10 };
-        let bestCards = {};
-        cards.forEach(c => {
-            let val = primieraValues[c.value] || 0;
-            if(!bestCards[c.suit] || bestCards[c.suit] < val) {
-                bestCards[c.suit] = val;
-            }
-        });
-        // Man muss in jeder der 4 Farben mindestens eine Karte haben, sonst 0
-        if(Object.keys(bestCards).length < 4) return 0;
-        return Object.values(bestCards).reduce((a, b) => a + b, 0);
-    }
-
-    function closeResultModal() {
-        document.getElementById('result-modal').classList.remove('active');
-        showScreen('main-menu');
-    }
-
-    function showRules() {
-        alert("SCOPA SPIELREGELN:\n\n1. Karten nehmen: Spiele eine Karte aus deiner Hand. Wenn ihr Wert der Summe einer oder mehrerer Tischkarten entspricht, nimmst du diese.\n2. Scopa: Räumst du den Tisch komplett ab, gibt das einen Extra-Punkt!\n3. Wertung am Ende:\n- Meiste Karten (>20)\n- Meiste Denari (Karo/Münzen)\n- Settebello (7 von Denari)\n- Primiera (Höchster Kartenwert pro Farbe)\n\nZiel: Erreiche die meisten Punkte und steige in der Liga auf!");
+        modal.style.display = 'flex';
     }
 </script>
+
 </body>
 </html>
